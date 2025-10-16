@@ -1,20 +1,20 @@
 <div>
   <img src="./.github/Image/shizapret.svg" width="200" height="200" align="left">
   <h1>
-   <p align="left">shizapret</p>
-  <a href="https://www.github.com/sch-izo/shizapret/releases/"><img alt="downloads"
+   <p align="left">ShiZapret Addition</p>
+  <a href="https://www.github.com/dotFelixan/ShiZapret-Addition/releases/"><img alt="downloads"
     src="https://img.shields.io/github/downloads/sch-izo/shizapret/total?labelColor=161616&color=242424" height="21" align="left"/></a>
   </a>
   <br>
-  <a href="https://www.github.com/sch-izo/shizapret/releases/latest"><img alt="downloads@latest"
+  <a href="https://www.github.com/dotFelixan/ShiZapret-Addition/releases/latest"><img alt="downloads@latest"
     src="https://img.shields.io/github/downloads/sch-izo/shizapret/latest/total?labelColor=161616&color=242424" height="21" align="left"/></a>
   </a>
   <br>
-  <a href="https://www.github.com/sch-izo/shizapret/releases/""><img alt="release"
+  <a href="https://www.github.com/dotFelixan/ShiZapret-Addition/releases/""><img alt="release"
     src="https://img.shields.io/github/v/release/sch-izo/shizapret?labelColor=161616&color=242424" height="21" align="left"/></a>
   </a>
   <br>
-  <a href="https://www.github.com/sch-izo/shizapret/tree/main"><img alt="code size"
+  <a href="https://www.github.com/dotFelixan/ShiZapret-Addition/tree/main"><img alt="code size"
     src="https://img.shields.io/github/languages/code-size/sch-izo/shizapret?labelColor=161616&color=242424" height="21" align="left"/></a>
   </a>
   <br>
@@ -22,7 +22,6 @@
 
 ### Форк [Flowseal/zapret-discord-youtube](https://github.com/Flowseal/zapret-discord-youtube) c автообновлением и обходом многих блокировок от Роскомнадзора
 #### [Поддержать разработчика zapret](https://github.com/bol-van/zapret?tab=readme-ov-file#%D0%BF%D0%BE%D0%B4%D0%B4%D0%B5%D1%80%D0%B6%D0%B0%D1%82%D1%8C-%D1%80%D0%B0%D0%B7%D1%80%D0%B0%D0%B1%D0%BE%D1%82%D1%87%D0%B8%D0%BA%D0%B0)
-###### спасибо @dotFelixan за иконку
 #
 
 > [!CAUTION]
@@ -43,7 +42,7 @@
 
 ## ❤Использование
 
-1. Загрузите архив (zip) со [страницы последнего релиза](https://github.com/sch-izo/shizapret/releases/latest)
+1. Загрузите архив (zip) со [страницы последнего релиза](https://www.github.com/dotFelixan/ShiZapret-Addition/releases/latest)
 
 2. Распакуйте содержимое архива по пути, который не содержит кириллицу (русские буквы)/специальные символы.
 
@@ -59,7 +58,7 @@
 
 ### Сайты не работают
 
-- **Обновитесь на [самую новую версию](https://www.github.com/sch-izo/shizapret/releases/latest)**
+- **Обновитесь на [самую новую версию](https://www.github.com/dotFelixan/ShiZapret-Addition/releases/latest)**
 
 - **Включите QUIC в браузере:**
 
@@ -115,7 +114,7 @@ sc delete {название, которые вы узнали в шаге 1}
 
 ### Не нашли своей проблемы
 
-* Создайте её [тут](https://github.com/sch-izo/shizapret/issues)
+* Создайте её [тут](https://www.github.com/dotFelixan/ShiZapret-Addition/issues)
 
 ## ⭐Поддержка проекта
 
