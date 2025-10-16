@@ -2,9 +2,6 @@
   <img src="./.github/Image/shizapret.svg" width="200" height="200" align="left">
   <h1>
    <p align="left">ShiZapret Addition</p>
-  <a href="https://www.github.com/dotFelixan/ShiZapret-Addition/releases/"><img alt="downloads"
-    src="https://img.shields.io/github/downloads/sch-izo/shizapret/total?labelColor=161616&color=242424" height="21" align="left"/></a>
-  </a>
 </div>
 
 ### Форк [sch-izo/shizapret](https://github.com/sch-izo/shizapret) | Форка [Flowseal/zapret-discord-youtube](https://github.com/Flowseal/zapret-discord-youtube) с автообновлением и обходом многих блокировок от Роскомнадзора.
