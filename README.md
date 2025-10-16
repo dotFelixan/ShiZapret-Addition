@@ -1,7 +1,8 @@
 <div>
   <img src="./.github/Image/shizapret.svg" width="200" height="200" align="left">
-   <p align="left"># ShiZapret Addition</p>
 </div>
+
+# ShiZapret Addition
 
 ### Форк [sch-izo/shizapret](https://github.com/sch-izo/shizapret) с маленьким количеством изменений + новые стратегии.
 #### Форка [Flowseal/zapret-discord-youtube](https://github.com/Flowseal/zapret-discord-youtube) с автообновлением и обходом многих блокировок от Роскомнадзора.
