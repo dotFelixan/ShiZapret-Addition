@@ -5,19 +5,6 @@
   <a href="https://www.github.com/dotFelixan/ShiZapret-Addition/releases/"><img alt="downloads"
     src="https://img.shields.io/github/downloads/sch-izo/shizapret/total?labelColor=161616&color=242424" height="21" align="left"/></a>
   </a>
-  <br>
-  <a href="https://www.github.com/dotFelixan/ShiZapret-Addition/releases/latest"><img alt="downloads@latest"
-    src="https://img.shields.io/github/downloads/sch-izo/shizapret/latest/total?labelColor=161616&color=242424" height="21" align="left"/></a>
-  </a>
-  <br>
-  <a href="https://www.github.com/dotFelixan/ShiZapret-Addition/releases/""><img alt="release"
-    src="https://img.shields.io/github/v/release/sch-izo/shizapret?labelColor=161616&color=242424" height="21" align="left"/></a>
-  </a>
-  <br>
-  <a href="https://www.github.com/dotFelixan/ShiZapret-Addition/tree/main"><img alt="code size"
-    src="https://img.shields.io/github/languages/code-size/sch-izo/shizapret?labelColor=161616&color=242424" height="21" align="left"/></a>
-  </a>
-  <br>
 </div>
 
 ### Форк [sch-izo/shizapret](https://github.com/sch-izo/shizapret) | Форка [Flowseal/zapret-discord-youtube](https://github.com/Flowseal/zapret-discord-youtube) с автообновлением и обходом многих блокировок от Роскомнадзора.
