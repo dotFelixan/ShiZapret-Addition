@@ -1,6 +1,4 @@
 <div>
-   <h1>
-
   <img src="./.github/Image/shizapret.svg" width="200" height="200" align="left">
    <p align="left">ShiZapret Addition</p>
 </div>
