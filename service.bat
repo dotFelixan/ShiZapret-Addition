@@ -1,5 +1,342 @@
 @echo off
-set "LOCAL_VERSION=1.8.0b"
+set "LOCAL_VERSION=1.0.0"
+
+:: Initialize language system
+if not exist "%~dp0params\Language\" mkdir "%~dp0params\Language"
+if not exist "%~dp0params\Language\current" (
+    echo EN> "%~dp0params\Language\current"
+)
+
+:: Load language
+set /p LANG=<"%~dp0params\Language\current"
+set "LANG=%LANG: =%"
+
+:: Set code page based on language
+if /i "%LANG%"=="RU" (
+    chcp 65001 > nul
+) else (
+    chcp 437 > nul
+)
+
+:: Load language strings
+if /i "%LANG%"=="RU" (
+    :: Russian strings
+    set MSG_ADMIN_STARTED=Запущено с правами администратора
+    set MSG_ADMIN_REQUEST=Запрос прав администратора...
+    set MSG_MENU=Меню
+    set MSG_MENU_INSTALL=Установить сервис
+    set MSG_MENU_REMOVE=Удалить сервисы
+    set MSG_MENU_STATUS=Проверить статус
+    set MSG_MENU_DIAGNOSTICS=Запустить диагностику
+    set MSG_MENU_UPDATES=Проверить обновления
+    set MSG_MENU_GAME_FILTER=Переключить игровой фильтр
+    set MSG_MENU_IPSET=Переключить ipset
+    set MSG_MENU_EXIT=Выход
+    set MSG_MENU_UPDATE_BIN=Обновить папку /bin/
+    set MSG_MENU_UPDATE_LIST=Обновить /lists/list-general.txt
+    set MSG_MENU_UPDATE_IPSET=Обновить /lists/ipset-all.txt
+    set MSG_MENU_UPDATE_ALL=Обновить всё
+    set MSG_MENU_SETTINGS=Изменить настройки
+    set MSG_MENU_GAME_TCP=Переключить игровой фильтр для TCP ^(чаты, аватары и т.д.^)
+    set MSG_MENU_VERIFY=Проверить все файлы
+    set MSG_MENU_LANGUAGE=Сменить язык
+    set MSG_MENU_CHOICE=Введите выбор ^(0-18^)
+    
+    set MSG_STATUS_INSTALLED=Стратегия сервиса установлена из
+    set MSG_STATUS_RUNNING=запущен
+    set MSG_STATUS_NOT_RUNNING=НЕ запущен
+    set MSG_STATUS_ALREADY_RUNNING=уже ЗАПУЩЕН как сервис, используйте service.bat и выберите Удалить сервисы если хотите запустить отдельный bat
+    set MSG_STATUS_STOP_PENDING=находится в состоянии STOP_PENDING. Это может быть вызвано конфликтом с другим обходом. Запустите диагностику для исправления конфликтов
+    set MSG_STATUS_BYPASS_ACTIVE=Обход ^(winws.exe^) АКТИВЕН
+    set MSG_STATUS_BYPASS_NOT_FOUND=Обход ^(winws.exe^) НЕ НАЙДЕН
+    
+    set MSG_REMOVE_NOT_INSTALLED=Сервис не установлен
+    
+    set MSG_INSTALL_PICK=Выберите один из вариантов:
+    set MSG_INSTALL_INPUT=Введите индекс файла ^(номер^)
+    set MSG_INSTALL_INVALID=Неверный выбор, выход...
+    set MSG_INSTALL_SUCCESS=[S] Конфигурация УСПЕШНА
+    
+    set MSG_UPDATE_FAILED=Не удалось получить последнюю версию. Это не влияет на работу ShiZapret Addition.
+    set MSG_UPDATE_LATEST=Установлена последняя версия:
+    set MSG_UPDATE_NEW=Доступна новая версия:
+    set MSG_UPDATE_RELEASE=Страница релиза:
+    set MSG_UPDATE_INSTALL=Хотите установить новую версию? ^(Y/N^) ^(по умолчанию: Y^)
+    set MSG_UPDATE_EXTRACTING=Извлечение
+    set MSG_UPDATE_INSTALLED=Обновление установлено в
+    set MSG_UPDATE_REMOVE_SERVICE=Хотите автоматически удалить сервис? ^(Y/N^) ^(по умолчанию: Y^)
+    set MSG_UPDATE_NOT_INSTALLED=Обновление не было установлено
+    
+    set MSG_DIAG_BFE_PASS=Проверка Base Filtering Engine пройдена
+    set MSG_DIAG_BFE_FAIL=[X] Base Filtering Engine не запущен. Этот сервис необходим для работы zapret
+    set MSG_DIAG_PROXY_ENABLED=[?] Системный прокси включен:
+    set MSG_DIAG_PROXY_CHECK=Убедитесь, что он действителен или отключите его, если не используете прокси
+    set MSG_DIAG_PROXY_PASS=Проверка прокси пройдена
+    set MSG_DIAG_TCP_PASS=Проверка TCP timestamps пройдена
+    set MSG_DIAG_TCP_DISABLED=[?] TCP timestamps отключены. Включение timestamps...
+    set MSG_DIAG_TCP_ENABLED=TCP timestamps успешно включены
+    set MSG_DIAG_TCP_FAILED=[X] Не удалось включить TCP timestamps
+    set MSG_DIAG_ADGUARD_FOUND=[X] Обнаружен процесс Adguard. Adguard может вызывать проблемы с Discord
+    set MSG_DIAG_ADGUARD_PASS=Проверка Adguard пройдена
+    set MSG_DIAG_KILLER_FOUND=[X] Обнаружены сервисы Killer. Killer конфликтует с zapret
+    set MSG_DIAG_KILLER_PASS=Проверка Killer пройдена
+    set MSG_DIAG_INTEL_FOUND=[X] Обнаружен Intel Connectivity Network Service. Он конфликтует с zapret
+    set MSG_DIAG_INTEL_PASS=Проверка Intel Connectivity пройдена
+    set MSG_DIAG_CHECKPOINT_FOUND=[X] Обнаружены сервисы Check Point. Check Point конфликтует с zapret
+    set MSG_DIAG_CHECKPOINT_TRY=Попробуйте удалить Check Point
+    set MSG_DIAG_CHECKPOINT_PASS=Проверка Check Point пройдена
+    set MSG_DIAG_SMARTBYTE_FOUND=[X] Обнаружены сервисы SmartByte. SmartByte конфликтует с zapret
+    set MSG_DIAG_SMARTBYTE_TRY=Попробуйте удалить или отключить SmartByte через services.msc
+    set MSG_DIAG_SMARTBYTE_PASS=Проверка SmartByte пройдена
+    set MSG_DIAG_VPN_FOUND=[?] Обнаружены некоторые VPN сервисы. Некоторые VPN могут конфликтовать с zapret
+    set MSG_DIAG_VPN_CHECK=Убедитесь, что все VPN отключены
+    set MSG_DIAG_VPN_PASS=Проверка VPN пройдена
+    set MSG_DIAG_DNS_NOT_SET=[?] DNS серверы вероятно не указаны.
+    set MSG_DIAG_DNS_PROVIDER=Вероятно автоматически используются DNS серверы провайдера, что может влиять на zapret. Рекомендуется установить известные DNS серверы и настроить DoH
+    set MSG_DIAG_DNS_PASS=Проверка DNS пройдена
+    set MSG_DIAG_DOH_NOT_SET=[?] Убедитесь, что вы настроили безопасный DNS в браузере с нестандартным провайдером DNS.
+    set MSG_DIAG_DOH_WIN11=Если вы используете Windows 11, вы можете настроить зашифрованный DNS в настройках, чтобы скрыть это предупреждение
+    set MSG_DIAG_DOH_PASS=Проверка Secure DNS пройдена
+    set MSG_DIAG_WINDIVERT_CONFLICT=[?] winws.exe не запущен, но сервис WinDivert активен. Попытка удалить WinDivert...
+    set MSG_DIAG_WINDIVERT_FAILED=[X] Не удалось удалить WinDivert. Проверка конфликтующих сервисов...
+    set MSG_DIAG_WINDIVERT_FOUND=[?] Найден конфликтующий сервис:
+    set MSG_DIAG_WINDIVERT_STOPPING=Остановка и удаление...
+    set MSG_DIAG_WINDIVERT_REMOVED=Успешно удален сервис:
+    set MSG_DIAG_WINDIVERT_REMOVE_FAILED=[X] Не удалось удалить сервис:
+    set MSG_DIAG_WINDIVERT_NO_CONFLICT=[X] Конфликтующие сервисы не найдены. Проверьте вручную, использует ли другой обход WinDivert.
+    set MSG_DIAG_WINDIVERT_RETRY=[?] Попытка удалить WinDivert снова...
+    set MSG_DIAG_WINDIVERT_SUCCESS=WinDivert успешно удален после удаления конфликтующих сервисов
+    set MSG_DIAG_WINDIVERT_STILL_FAILED=[X] WinDivert всё ещё не может быть удален. Проверьте вручную, использует ли другой обход WinDivert.
+    set MSG_DIAG_CONFLICT_FOUND=[X] Обнаружены конфликтующие сервисы обхода:
+    set MSG_DIAG_CONFLICT_REMOVE=Хотите удалить эти конфликтующие сервисы? ^(Y/N^) ^(по умолчанию: N^)
+    set MSG_DIAG_DISCORD_CACHE=Хотите очистить кэш Discord? ^(Y/N^) ^(по умолчанию: Y^)
+    set MSG_DIAG_DISCORD_RUNNING=запущен, закрытие...
+    set MSG_DIAG_DISCORD_CLOSED=успешно закрыт
+    set MSG_DIAG_DISCORD_CLOSE_FAILED=Не удалось закрыть
+    set MSG_DIAG_DISCORD_CLEANING=Очистка кэша Discord...
+    set MSG_DIAG_DISCORD_DELETED=Успешно удалено
+    set MSG_DIAG_DISCORD_DELETE_FAILED=Не удалось удалить
+    set MSG_DIAG_DISCORD_NOT_EXIST=не существует
+    set MSG_DIAG_DISCORD_PTB_CLEANING=Очистка кэша Discord PTB...
+    set MSG_DIAG_DISCORD_CANARY_CLEANING=Очистка кэша Discord Canary...
+    
+    set MSG_GAME_ENABLING=Включение игрового фильтра...
+    set MSG_GAME_DISABLING=Отключение игрового фильтра...
+    set MSG_GAME_RESTART=Перезапустите ShiZapret Addition для применения изменений.
+    set MSG_GAME_TCP_ENABLING=Включение игрового фильтра для TCP...
+    set MSG_GAME_TCP_DISABLING=Отключение игрового фильтра для TCP...
+    
+    set MSG_IPSET_NOT_DOWNLOADED=ipset не загружен.
+    set MSG_IPSET_ENABLING=Включение обхода на основе ipset...
+    set MSG_IPSET_DISABLING=Отключение обхода на основе ipset...
+    set MSG_IPSET_NO_BACKUP=Ошибка: нет резервной копии для восстановления. Обновите список из меню сервиса самостоятельно
+    
+    set MSG_DOWNLOAD=Загрузка
+    set MSG_DOWNLOAD_SOURCE=Источник:
+    set MSG_VERIFY=Проверка
+    set MSG_VERIFY_FAILED=не прошёл проверку. Файл может быть поврежден или правильный хэш ещё не обновлен. Ваш хэш:
+    set MSG_VERIFY_CORRECT=Правильный хэш:
+    set MSG_VERIFY_SUCCESS=успешно проверен. Хэш:
+    set MSG_VERIFY_NO_REACH=Не удалось достичь
+    set MSG_VERIFY_TO_VERIFY=для проверки
+    set MSG_VERIFY_YOUR_HASH=Ваш хэш:
+    
+    set MSG_SETTINGS_TITLE=Настройки
+    set MSG_SETTINGS_UPDATE_START=Обновление при запуске:
+    set MSG_SETTINGS_UPDATE_CYGWIN=Обновлять cygwin1.dll:
+    set MSG_SETTINGS_UPDATE_WINDIVERT=Обновлять WinDivert.dll:
+    set MSG_SETTINGS_UPDATE_WINDIVERT64=Обновлять WinDivert64.sys:
+    set MSG_SETTINGS_UPDATE_WINWS=Обновлять winws.exe:
+    set MSG_SETTINGS_UPDATE_IPSET=Обновлять ipset-all.txt:
+    set MSG_SETTINGS_UPDATE_LIST=Обновлять list-general.txt:
+    set MSG_SETTINGS_VERIFY=Проверять файлы при обновлении:
+    set MSG_SETTINGS_LIST_SOURCE=Источник list-general.txt:
+    set MSG_SETTINGS_IPSET_SOURCE=Источник ipset-all:
+    set MSG_SETTINGS_HASH_ALG=Алгоритм хэша верификатора:
+    set MSG_SETTINGS_BACK=Назад
+    set MSG_SETTINGS_CHANGE=Изменить настройку:
+    set MSG_SETTINGS_RECEIVING=Получение стандартных источников загрузки...
+    set MSG_SETTINGS_COULD_NOT=Не удалось получить стандартный источник! Откат к
+    
+    set MSG_SOURCE_CURRENT=Текущий источник:
+    set MSG_SOURCE_ENTER_0=Введите 0 для возврата
+    set MSG_SOURCE_ENTER_1=Введите 1 для сброса к стандартному
+    set MSG_SOURCE_NEW_IPSET=Введите новый источник ipset-all.txt ^(ссылка, начинается с http^(s^)://^):
+    set MSG_SOURCE_NEW_LIST=Введите новый источник list-general.txt ^(ссылка, начинается с http^(s^)://^):
+    
+    set MSG_ALG_CURRENT=Текущий алгоритм:
+    set MSG_ALG_DEFAULT=по умолчанию:
+    set MSG_ALG_NEW=Введите новый алгоритм:
+    
+    set MSG_LANG_CURRENT=Текущий язык
+    set MSG_LANG_BACK=Назад
+    set MSG_LANG_SELECT=Выберите язык
+    set MSG_LANG_CHANGED=Язык изменён. Перезапуск...
+    
+    set enabled=включен
+    set disabled=отключен
+    set empty=пусто
+    set loaded=загружен
+) else (
+    :: English strings
+    set MSG_ADMIN_STARTED=Started with admin rights
+    set MSG_ADMIN_REQUEST=Requesting admin rights...
+    set MSG_MENU=Menu
+    set MSG_MENU_INSTALL=Install Service
+    set MSG_MENU_REMOVE=Remove Services
+    set MSG_MENU_STATUS=Check Status
+    set MSG_MENU_DIAGNOSTICS=Run Diagnostics
+    set MSG_MENU_UPDATES=Check Updates
+    set MSG_MENU_GAME_FILTER=Switch Game Filter
+    set MSG_MENU_IPSET=Switch ipset
+    set MSG_MENU_EXIT=Exit
+    set MSG_MENU_UPDATE_BIN=Update /bin/ Folder
+    set MSG_MENU_UPDATE_LIST=Update /lists/list-general.txt
+    set MSG_MENU_UPDATE_IPSET=Update /lists/ipset-all.txt
+    set MSG_MENU_UPDATE_ALL=Update Everything
+    set MSG_MENU_SETTINGS=Change Settings
+    set MSG_MENU_GAME_TCP=Switch Game Filter for TCP ^(Chats, Profile Pictures, etc.^)
+    set MSG_MENU_VERIFY=Verify All Files
+    set MSG_MENU_LANGUAGE=Change Language
+    set MSG_MENU_CHOICE=Enter choice ^(0-18^)
+    
+    set MSG_STATUS_INSTALLED=Service strategy installed from
+    set MSG_STATUS_RUNNING=is RUNNING
+    set MSG_STATUS_NOT_RUNNING=is NOT running
+    set MSG_STATUS_ALREADY_RUNNING=is ALREADY RUNNING as service, use service.bat and choose Remove Services first if you want to run standalone bat
+    set MSG_STATUS_STOP_PENDING=is STOP_PENDING. This may be caused by a conflict with another bypass. Run Diagnostics to try to fix conflicts
+    set MSG_STATUS_BYPASS_ACTIVE=Bypass ^(winws.exe^) is ACTIVE
+    set MSG_STATUS_BYPASS_NOT_FOUND=Bypass ^(winws.exe^) NOT FOUND
+    
+    set MSG_REMOVE_NOT_INSTALLED=Service is not installed
+    
+    set MSG_INSTALL_PICK=Pick one of the options:
+    set MSG_INSTALL_INPUT=Input file index ^(number^)
+    set MSG_INSTALL_INVALID=Invalid choice, exiting...
+    set MSG_INSTALL_SUCCESS=[S] Config SUCCESS
+    
+    set MSG_UPDATE_FAILED=Failed to fetch the latest version. This does not affect the operation of ShiZapret Addition.
+    set MSG_UPDATE_LATEST=Latest version installed:
+    set MSG_UPDATE_NEW=New version available:
+    set MSG_UPDATE_RELEASE=Release page:
+    set MSG_UPDATE_INSTALL=Do you want to install the new version? ^(Y/N^) ^(default: Y^)
+    set MSG_UPDATE_EXTRACTING=Extracting
+    set MSG_UPDATE_INSTALLED=Update installed into
+    set MSG_UPDATE_REMOVE_SERVICE=Do you want to automatically remove service? ^(Y/N^) ^(default: Y^)
+    set MSG_UPDATE_NOT_INSTALLED=Update was not installed
+    
+    set MSG_DIAG_BFE_PASS=Base Filtering Engine check passed
+    set MSG_DIAG_BFE_FAIL=[X] Base Filtering Engine is not running. This service is required for zapret to work
+    set MSG_DIAG_PROXY_ENABLED=[?] System proxy is enabled:
+    set MSG_DIAG_PROXY_CHECK=Make sure it's valid or disable it if you don't use a proxy
+    set MSG_DIAG_PROXY_PASS=Proxy check passed
+    set MSG_DIAG_TCP_PASS=TCP timestamps check passed
+    set MSG_DIAG_TCP_DISABLED=[?] TCP timestamps are disabled. Enabling timestamps...
+    set MSG_DIAG_TCP_ENABLED=TCP timestamps successfully enabled
+    set MSG_DIAG_TCP_FAILED=[X] Failed to enable TCP timestamps
+    set MSG_DIAG_ADGUARD_FOUND=[X] Adguard process found. Adguard may cause problems with Discord
+    set MSG_DIAG_ADGUARD_PASS=Adguard check passed
+    set MSG_DIAG_KILLER_FOUND=[X] Killer services found. Killer conflicts with zapret
+    set MSG_DIAG_KILLER_PASS=Killer check passed
+    set MSG_DIAG_INTEL_FOUND=[X] Intel Connectivity Network Service found. It conflicts with zapret
+    set MSG_DIAG_INTEL_PASS=Intel Connectivity check passed
+    set MSG_DIAG_CHECKPOINT_FOUND=[X] Check Point services found. Check Point conflicts with zapret
+    set MSG_DIAG_CHECKPOINT_TRY=Try to uninstall Check Point
+    set MSG_DIAG_CHECKPOINT_PASS=Check Point check passed
+    set MSG_DIAG_SMARTBYTE_FOUND=[X] SmartByte services found. SmartByte conflicts with zapret
+    set MSG_DIAG_SMARTBYTE_TRY=Try to uninstall or disable SmartByte through services.msc
+    set MSG_DIAG_SMARTBYTE_PASS=SmartByte check passed
+    set MSG_DIAG_VPN_FOUND=[?] Some VPN services found. Some VPNs can conflict with zapret
+    set MSG_DIAG_VPN_CHECK=Make sure that all VPNs are disabled
+    set MSG_DIAG_VPN_PASS=VPN check passed
+    set MSG_DIAG_DNS_NOT_SET=[?] DNS servers are probably not specified.
+    set MSG_DIAG_DNS_PROVIDER=Provider's DNS servers are probably automatically used, which may affect zapret. It is recommended to install well-known DNS servers and setup DoH
+    set MSG_DIAG_DNS_PASS=DNS check passed
+    set MSG_DIAG_DOH_NOT_SET=[?] Make sure you have configured secure DNS in a browser with a non-default DNS service provider.
+    set MSG_DIAG_DOH_WIN11=If you use Windows 11, you can configure encrypted DNS in the Settings to hide this warning
+    set MSG_DIAG_DOH_PASS=Secure DNS check passed
+    set MSG_DIAG_WINDIVERT_CONFLICT=[?] winws.exe is not running but WinDivert service is active. Attempting to delete WinDivert...
+    set MSG_DIAG_WINDIVERT_FAILED=[X] Failed to delete WinDivert. Checking for conflicting services...
+    set MSG_DIAG_WINDIVERT_FOUND=[?] Found conflicting service:
+    set MSG_DIAG_WINDIVERT_STOPPING=Stopping and removing...
+    set MSG_DIAG_WINDIVERT_REMOVED=Successfully removed service:
+    set MSG_DIAG_WINDIVERT_REMOVE_FAILED=[X] Failed to remove service:
+    set MSG_DIAG_WINDIVERT_NO_CONFLICT=[X] No conflicting services found. Check manually if any other bypass is using WinDivert.
+    set MSG_DIAG_WINDIVERT_RETRY=[?] Attempting to delete WinDivert again...
+    set MSG_DIAG_WINDIVERT_SUCCESS=WinDivert successfully deleted after removing conflicting services
+    set MSG_DIAG_WINDIVERT_STILL_FAILED=[X] WinDivert still cannot be deleted. Check manually if any other bypass is using WinDivert.
+    set MSG_DIAG_CONFLICT_FOUND=[X] Conflicting bypass services found:
+    set MSG_DIAG_CONFLICT_REMOVE=Do you want to remove these conflicting services? ^(Y/N^) ^(default: N^)
+    set MSG_DIAG_DISCORD_CACHE=Do you want to clear the Discord cache? ^(Y/N^) ^(default: Y^)
+    set MSG_DIAG_DISCORD_RUNNING=is running, closing...
+    set MSG_DIAG_DISCORD_CLOSED=was successfully closed
+    set MSG_DIAG_DISCORD_CLOSE_FAILED=Unable to close
+    set MSG_DIAG_DISCORD_CLEANING=Cleaning Discord cache...
+    set MSG_DIAG_DISCORD_DELETED=Successfully deleted
+    set MSG_DIAG_DISCORD_DELETE_FAILED=Failed to delete
+    set MSG_DIAG_DISCORD_NOT_EXIST=does not exist
+    set MSG_DIAG_DISCORD_PTB_CLEANING=Cleaning Discord PTB cache...
+    set MSG_DIAG_DISCORD_CANARY_CLEANING=Cleaning Discord Canary cache...
+    
+    set MSG_GAME_ENABLING=Enabling game filter...
+    set MSG_GAME_DISABLING=Disabling game filter...
+    set MSG_GAME_RESTART=Restart ShiZapret Addition to apply the changes.
+    set MSG_GAME_TCP_ENABLING=Enabling game filter for TCP...
+    set MSG_GAME_TCP_DISABLING=Disabling game filter for TCP...
+    
+    set MSG_IPSET_NOT_DOWNLOADED=ipset is not downloaded.
+    set MSG_IPSET_ENABLING=Enabling ipset based bypass...
+    set MSG_IPSET_DISABLING=Disabling ipset based bypass...
+    set MSG_IPSET_NO_BACKUP=Error: no backup to restore. Update list from service menu by yourself
+    
+    set MSG_DOWNLOAD=Downloading
+    set MSG_DOWNLOAD_SOURCE=Source:
+    set MSG_VERIFY=Verifying
+    set MSG_VERIFY_FAILED=failed the verification. File might be damaged or the correct hash has not been updated yet. Your hash:
+    set MSG_VERIFY_CORRECT=Correct hash:
+    set MSG_VERIFY_SUCCESS=successfully verified. Hash:
+    set MSG_VERIFY_NO_REACH=Could not reach
+    set MSG_VERIFY_TO_VERIFY=to verify
+    set MSG_VERIFY_YOUR_HASH=Your hash:
+    
+    set MSG_SETTINGS_TITLE=Settings
+    set MSG_SETTINGS_UPDATE_START=Update on start:
+    set MSG_SETTINGS_UPDATE_CYGWIN=Update cygwin1.dll:
+    set MSG_SETTINGS_UPDATE_WINDIVERT=Update WinDivert.dll:
+    set MSG_SETTINGS_UPDATE_WINDIVERT64=Update WinDivert64.sys:
+    set MSG_SETTINGS_UPDATE_WINWS=Update winws.exe:
+    set MSG_SETTINGS_UPDATE_IPSET=Update ipset-all.txt:
+    set MSG_SETTINGS_UPDATE_LIST=Update list-general.txt:
+    set MSG_SETTINGS_VERIFY=Verify files when updating:
+    set MSG_SETTINGS_LIST_SOURCE=list-general.txt Source:
+    set MSG_SETTINGS_IPSET_SOURCE=ipset-all Source:
+    set MSG_SETTINGS_HASH_ALG=Verifier Hash Algorithm:
+    set MSG_SETTINGS_BACK=Back
+    set MSG_SETTINGS_CHANGE=Change Setting:
+    set MSG_SETTINGS_RECEIVING=Receiving default download sources...
+    set MSG_SETTINGS_COULD_NOT=Could not receive the default source! Fell back to
+    
+    set MSG_SOURCE_CURRENT=Current source:
+    set MSG_SOURCE_ENTER_0=Enter 0 to go back
+    set MSG_SOURCE_ENTER_1=Enter 1 to reset to default
+    set MSG_SOURCE_NEW_IPSET=Enter the new ipset-all.txt source ^(link, starts with http^(s^)://^):
+    set MSG_SOURCE_NEW_LIST=Enter the new list-general.txt source ^(link, starts with http^(s^)://^):
+    
+    set MSG_ALG_CURRENT=Current algorithm:
+    set MSG_ALG_DEFAULT=default:
+    set MSG_ALG_NEW=Enter the new algorithm:
+    
+    set MSG_LANG_CURRENT=Current language
+    set MSG_LANG_BACK=Back
+    set MSG_LANG_SELECT=Select language
+    set MSG_LANG_CHANGED=Language changed. Restarting...
+    
+    set enabled=enabled
+    set disabled=disabled
+    set empty=empty
+    set loaded=loaded
+)
+call :tcp_enable
 
 :: External commands
 if "%~1"=="status_zapret" (
@@ -16,7 +353,6 @@ if "%~1"=="check_updates" (
     )
     exit /b
 )
-
 
 if "%~1"=="load_game_filter" (
     call :game_switch_status
@@ -44,9 +380,9 @@ if "%~1"=="et" (
 )
 
 if "%1"=="admin" (
-    echo Started with admin rights
+    echo %MSG_ADMIN_STARTED%
 ) else (
-    echo Requesting admin rights...
+    echo %MSG_ADMIN_REQUEST%
     powershell -Command "Start-Process 'cmd.exe' -ArgumentList '/c \"\"%~f0\" admin\"' -Verb RunAs"
     exit
 )
@@ -66,24 +402,25 @@ if "%~1"=="settings" (
 )
 echo =======================
 echo =       v!LOCAL_VERSION!        =
-echo =========Menu==========
-echo 1. Install Service
-echo 2. Remove Services
-echo 3. Check Status
-echo 4. Run Diagnostics
-echo 5. Check Updates
-echo 6. Switch Game Filter (%GameFilterStatus%)
-echo 7. Switch ipset (%IPsetStatus%)
-echo 0. Exit
-echo ======shizapret========
-echo 11. Update /bin/ Folder
-echo 12. Update /lists/list-general.txt
-echo 13. Update /lists/ipset-all.txt
-echo 14. Update Everything
-echo 15. Change Settings
-echo 16. Switch Game Filter for TCP (Chats, Profile Pictures, etc.) (%GameFilterTCPStatus%)
-echo 17. Verify All Files
-set /p menu_choice=Enter choice (0-17): 
+echo ==========%MSG_MENU%===========
+echo 1. %MSG_MENU_INSTALL%
+echo 2. %MSG_MENU_REMOVE%
+echo 3. %MSG_MENU_STATUS%
+echo 4. %MSG_MENU_DIAGNOSTICS%
+echo 5. %MSG_MENU_UPDATES%
+echo 6. %MSG_MENU_GAME_FILTER% (%GameFilterStatus%)
+echo 7. %MSG_MENU_IPSET% (%IPsetStatus%)
+echo 0. %MSG_MENU_EXIT%
+echo ======ShiZapret Addition========
+echo 11. %MSG_MENU_UPDATE_BIN%
+echo 12. %MSG_MENU_UPDATE_LIST%
+echo 13. %MSG_MENU_UPDATE_IPSET%
+echo 14. %MSG_MENU_UPDATE_ALL%
+echo 15. %MSG_MENU_SETTINGS%
+echo 16. %MSG_MENU_GAME_TCP% (%GameFilterTCPStatus%)
+echo 17. %MSG_MENU_VERIFY%
+:: echo 18. %MSG_MENU_LANGUAGE% (%LANG%)
+set /p menu_choice=%MSG_MENU_CHOICE%: 
 
 if "%menu_choice%"=="1" goto service_install
 if "%menu_choice%"=="2" goto service_remove
@@ -100,24 +437,374 @@ if "%menu_choice%"=="14" goto et
 if "%menu_choice%"=="15" goto settings
 if "%menu_choice%"=="16" goto game_switch_tcp
 if "%menu_choice%"=="17" goto verifyall
+:: if "%menu_choice%"=="18" goto language_switch
 goto menu
+
+:: LANGUAGE SWITCH =====================
+:language_switch
+cls
+echo %MSG_LANG_CURRENT%: %LANG%
+echo ==============================
+echo 1. English (EN)
+echo 2. Русский (RU)
+echo 0. %MSG_LANG_BACK%
+echo ==============================
+set /p lang_choice=%MSG_LANG_SELECT%: 
+
+if "%lang_choice%"=="1" (
+    echo EN> "%~dp0params\Language\current"
+    echo %MSG_LANG_CHANGED%
+    timeout /t 2 > nul
+    goto restart_script
+)
+if "%lang_choice%"=="2" (
+    echo RU> "%~dp0params\Language\current"
+    echo %MSG_LANG_CHANGED%
+    timeout /t 2 > nul
+    goto restart_script
+)
+if "%lang_choice%"=="0" goto menu
+goto language_switch
+
+:restart_script
+start "" "%~f0" admin
+exit
+
+:: LOAD LANGUAGE STRINGS ===============
+:load_language_strings
+if /i "%LANG%"=="RU" (
+    :: Russian strings - UTF-8 encoding
+    set MSG_ADMIN_STARTED=Запущено с правами администратора
+    set MSG_ADMIN_REQUEST=Запрос прав администратора...
+    set MSG_MENU=Меню
+    set MSG_MENU_INSTALL=Установить сервис
+    set MSG_MENU_REMOVE=Удалить сервисы
+    set MSG_MENU_STATUS=Проверить статус
+    set MSG_MENU_DIAGNOSTICS=Запустить диагностику
+    set MSG_MENU_UPDATES=Проверить обновления
+    set MSG_MENU_GAME_FILTER=Переключить игровой фильтр
+    set MSG_MENU_IPSET=Переключить ipset
+    set MSG_MENU_EXIT=Выход
+    set MSG_MENU_UPDATE_BIN=Обновить папку /bin/
+    set MSG_MENU_UPDATE_LIST=Обновить /lists/list-general.txt
+    set MSG_MENU_UPDATE_IPSET=Обновить /lists/ipset-all.txt
+    set MSG_MENU_UPDATE_ALL=Обновить всё
+    set MSG_MENU_SETTINGS=Изменить настройки
+    set MSG_MENU_GAME_TCP=Переключить игровой фильтр для TCP (чаты, аватары и т.д.)
+    set MSG_MENU_VERIFY=Проверить все файлы
+    set MSG_MENU_LANGUAGE=Сменить язык
+    set MSG_MENU_CHOICE=Введите выбор (0-18^)
+    
+    set MSG_STATUS_INSTALLED=Стратегия сервиса установлена из
+    set MSG_STATUS_RUNNING=запущен
+    set MSG_STATUS_NOT_RUNNING=НЕ запущен
+    set MSG_STATUS_ALREADY_RUNNING=уже ЗАПУЩЕН как сервис, используйте service.bat и выберите Удалить сервисы если хотите запустить отдельный bat
+    set MSG_STATUS_STOP_PENDING=находится в состоянии STOP_PENDING. Это может быть вызвано конфликтом с другим обходом. Запустите диагностику для исправления конфликтов
+    set MSG_STATUS_BYPASS_ACTIVE=Обход (winws.exe^) АКТИВЕН
+    set MSG_STATUS_BYPASS_NOT_FOUND=Обход (winws.exe^) НЕ НАЙДЕН
+    
+    set MSG_REMOVE_NOT_INSTALLED=Сервис не установлен
+    
+    set MSG_INSTALL_PICK=Выберите один из вариантов:
+    set MSG_INSTALL_INPUT=Введите индекс файла (номер^)
+    set MSG_INSTALL_INVALID=Неверный выбор, выход...
+    set MSG_INSTALL_SUCCESS=[S] Конфигурация УСПЕШНА
+    
+    set MSG_UPDATE_FAILED=Не удалось получить последнюю версию. Это не влияет на работу ShiZapret Addition.
+    set MSG_UPDATE_LATEST=Установлена последняя версия:
+    set MSG_UPDATE_NEW=Доступна новая версия:
+    set MSG_UPDATE_RELEASE=Страница релиза:
+    set MSG_UPDATE_INSTALL=Хотите установить новую версию? (Y/N) (по умолчанию: Y)
+    set MSG_UPDATE_EXTRACTING=Извлечение
+    set MSG_UPDATE_INSTALLED=Обновление установлено в
+    set MSG_UPDATE_REMOVE_SERVICE=Хотите автоматически удалить сервис? (Y/N) (по умолчанию: Y)
+    set MSG_UPDATE_NOT_INSTALLED=Обновление не было установлено
+    
+    set MSG_DIAG_BFE_PASS=Проверка Base Filtering Engine пройдена
+    set MSG_DIAG_BFE_FAIL=[X] Base Filtering Engine не запущен. Этот сервис необходим для работы zapret
+    set MSG_DIAG_PROXY_ENABLED=[?] Системный прокси включен:
+    set MSG_DIAG_PROXY_CHECK=Убедитесь, что он действителен или отключите его, если не используете прокси
+    set MSG_DIAG_PROXY_PASS=Проверка прокси пройдена
+    set MSG_DIAG_TCP_PASS=Проверка TCP timestamps пройдена
+    set MSG_DIAG_TCP_DISABLED=[?] TCP timestamps отключены. Включение timestamps...
+    set MSG_DIAG_TCP_ENABLED=TCP timestamps успешно включены
+    set MSG_DIAG_TCP_FAILED=[X] Не удалось включить TCP timestamps
+    set MSG_DIAG_ADGUARD_FOUND=[X] Обнаружен процесс Adguard. Adguard может вызывать проблемы с Discord
+    set MSG_DIAG_ADGUARD_PASS=Проверка Adguard пройдена
+    set MSG_DIAG_KILLER_FOUND=[X] Обнаружены сервисы Killer. Killer конфликтует с zapret
+    set MSG_DIAG_KILLER_PASS=Проверка Killer пройдена
+    set MSG_DIAG_INTEL_FOUND=[X] Обнаружен Intel Connectivity Network Service. Он конфликтует с zapret
+    set MSG_DIAG_INTEL_PASS=Проверка Intel Connectivity пройдена
+    set MSG_DIAG_CHECKPOINT_FOUND=[X] Обнаружены сервисы Check Point. Check Point конфликтует с zapret
+    set MSG_DIAG_CHECKPOINT_TRY=Попробуйте удалить Check Point
+    set MSG_DIAG_CHECKPOINT_PASS=Проверка Check Point пройдена
+    set MSG_DIAG_SMARTBYTE_FOUND=[X] Обнаружены сервисы SmartByte. SmartByte конфликтует с zapret
+    set MSG_DIAG_SMARTBYTE_TRY=Попробуйте удалить или отключить SmartByte через services.msc
+    set MSG_DIAG_SMARTBYTE_PASS=Проверка SmartByte пройдена
+    set MSG_DIAG_VPN_FOUND=[?] Обнаружены некоторые VPN сервисы. Некоторые VPN могут конфликтовать с zapret
+    set MSG_DIAG_VPN_CHECK=Убедитесь, что все VPN отключены
+    set MSG_DIAG_VPN_PASS=Проверка VPN пройдена
+    set MSG_DIAG_DNS_NOT_SET=[?] DNS серверы вероятно не указаны.
+    set MSG_DIAG_DNS_PROVIDER=Вероятно автоматически используются DNS серверы провайдера, что может влиять на zapret. Рекомендуется установить известные DNS серверы и настроить DoH
+    set MSG_DIAG_DNS_PASS=Проверка DNS пройдена
+    set MSG_DIAG_DOH_NOT_SET=[?] Убедитесь, что вы настроили безопасный DNS в браузере с нестандартным провайдером DNS.
+    set MSG_DIAG_DOH_WIN11=Если вы используете Windows 11, вы можете настроить зашифрованный DNS в настройках, чтобы скрыть это предупреждение
+    set MSG_DIAG_DOH_PASS=Проверка Secure DNS пройдена
+    set MSG_DIAG_WINDIVERT_CONFLICT=[?] winws.exe не запущен, но сервис WinDivert активен. Попытка удалить WinDivert...
+    set MSG_DIAG_WINDIVERT_FAILED=[X] Не удалось удалить WinDivert. Проверка конфликтующих сервисов...
+    set MSG_DIAG_WINDIVERT_FOUND=[?] Найден конфликтующий сервис:
+    set MSG_DIAG_WINDIVERT_STOPPING=Остановка и удаление...
+    set MSG_DIAG_WINDIVERT_REMOVED=Успешно удален сервис:
+    set MSG_DIAG_WINDIVERT_REMOVE_FAILED=[X] Не удалось удалить сервис:
+    set MSG_DIAG_WINDIVERT_NO_CONFLICT=[X] Конфликтующие сервисы не найдены. Проверьте вручную, использует ли другой обход WinDivert.
+    set MSG_DIAG_WINDIVERT_RETRY=[?] Попытка удалить WinDivert снова...
+    set MSG_DIAG_WINDIVERT_SUCCESS=WinDivert успешно удален после удаления конфликтующих сервисов
+    set MSG_DIAG_WINDIVERT_STILL_FAILED=[X] WinDivert всё ещё не может быть удален. Проверьте вручную, использует ли другой обход WinDivert.
+    set MSG_DIAG_CONFLICT_FOUND=[X] Обнаружены конфликтующие сервисы обхода:
+    set MSG_DIAG_CONFLICT_REMOVE=Хотите удалить эти конфликтующие сервисы? (Y/N) (по умолчанию: N)
+    set MSG_DIAG_DISCORD_CACHE=Хотите очистить кэш Discord? (Y/N) (по умолчанию: Y)
+    set MSG_DIAG_DISCORD_RUNNING=запущен, закрытие...
+    set MSG_DIAG_DISCORD_CLOSED=успешно закрыт
+    set MSG_DIAG_DISCORD_CLOSE_FAILED=Не удалось закрыть
+    set MSG_DIAG_DISCORD_CLEANING=Очистка кэша Discord...
+    set MSG_DIAG_DISCORD_DELETED=Успешно удалено
+    set MSG_DIAG_DISCORD_DELETE_FAILED=Не удалось удалить
+    set MSG_DIAG_DISCORD_NOT_EXIST=не существует
+    set MSG_DIAG_DISCORD_PTB_CLEANING=Очистка кэша Discord PTB...
+    set MSG_DIAG_DISCORD_CANARY_CLEANING=Очистка кэша Discord Canary...
+    
+    set MSG_GAME_ENABLING=Включение игрового фильтра...
+    set MSG_GAME_DISABLING=Отключение игрового фильтра...
+    set MSG_GAME_RESTART=Перезапустите ShiZapret Addition для применения изменений.
+    set MSG_GAME_TCP_ENABLING=Включение игрового фильтра для TCP...
+    set MSG_GAME_TCP_DISABLING=Отключение игрового фильтра для TCP...
+    
+    set MSG_IPSET_NOT_DOWNLOADED=ipset не загружен.
+    set MSG_IPSET_ENABLING=Включение обхода на основе ipset...
+    set MSG_IPSET_DISABLING=Отключение обхода на основе ipset...
+    set MSG_IPSET_NO_BACKUP=Ошибка: нет резервной копии для восстановления. Обновите список из меню сервиса самостоятельно
+    
+    set MSG_DOWNLOAD=Загрузка
+    set MSG_DOWNLOAD_SOURCE=Источник:
+    set MSG_VERIFY=Проверка
+    set MSG_VERIFY_FAILED=не прошёл проверку. Файл может быть поврежден или правильный хэш ещё не обновлен. Ваш хэш:
+    set MSG_VERIFY_CORRECT=Правильный хэш:
+    set MSG_VERIFY_SUCCESS=успешно проверен. Хэш:
+    set MSG_VERIFY_NO_REACH=Не удалось достичь
+    set MSG_VERIFY_TO_VERIFY=для проверки
+    set MSG_VERIFY_YOUR_HASH=Ваш хэш:
+    
+    set MSG_SETTINGS_TITLE=Настройки
+    set MSG_SETTINGS_UPDATE_START=Обновление при запуске:
+    set MSG_SETTINGS_UPDATE_CYGWIN=Обновлять cygwin1.dll:
+    set MSG_SETTINGS_UPDATE_WINDIVERT=Обновлять WinDivert.dll:
+    set MSG_SETTINGS_UPDATE_WINDIVERT64=Обновлять WinDivert64.sys:
+    set MSG_SETTINGS_UPDATE_WINWS=Обновлять winws.exe:
+    set MSG_SETTINGS_UPDATE_IPSET=Обновлять ipset-all.txt:
+    set MSG_SETTINGS_UPDATE_LIST=Обновлять list-general.txt:
+    set MSG_SETTINGS_VERIFY=Проверять файлы при обновлении:
+    set MSG_SETTINGS_LIST_SOURCE=Источник list-general.txt:
+    set MSG_SETTINGS_IPSET_SOURCE=Источник ipset-all:
+    set MSG_SETTINGS_HASH_ALG=Алгоритм хэша верификатора:
+    set MSG_SETTINGS_BACK=Назад
+    set MSG_SETTINGS_CHANGE=Изменить настройку:
+    set MSG_SETTINGS_RECEIVING=Получение стандартных источников загрузки...
+    set MSG_SETTINGS_COULD_NOT=Не удалось получить стандартный источник! Откат к
+    
+    set MSG_SOURCE_CURRENT=Текущий источник:
+    set MSG_SOURCE_ENTER_0=Введите 0 для возврата
+    set MSG_SOURCE_ENTER_1=Введите 1 для сброса к стандартному
+    set MSG_SOURCE_NEW_IPSET=Введите новый источник ipset-all.txt (ссылка, начинается с http(s)://):
+    set MSG_SOURCE_NEW_LIST=Введите новый источник list-general.txt (ссылка, начинается с http(s)://):
+    
+    set MSG_ALG_CURRENT=Текущий алгоритм:
+    set MSG_ALG_DEFAULT=по умолчанию:
+    set MSG_ALG_NEW=Введите новый алгоритм:
+    
+    set MSG_LANG_CURRENT=Текущий язык
+    set MSG_LANG_BACK=Назад
+    set MSG_LANG_SELECT=Выберите язык
+    set MSG_LANG_CHANGED=Язык изменён. Перезапуск...
+    
+    set enabled=включен
+    set disabled=отключен
+    set empty=пусто
+    set loaded=загружен
+) else (
+    :: English strings
+    set MSG_ADMIN_STARTED=Started with admin rights
+    set MSG_ADMIN_REQUEST=Requesting admin rights...
+    set MSG_MENU=Menu
+    set MSG_MENU_INSTALL=Install Service
+    set MSG_MENU_REMOVE=Remove Services
+    set MSG_MENU_STATUS=Check Status
+    set MSG_MENU_DIAGNOSTICS=Run Diagnostics
+    set MSG_MENU_UPDATES=Check Updates
+    set MSG_MENU_GAME_FILTER=Switch Game Filter
+    set MSG_MENU_IPSET=Switch ipset
+    set MSG_MENU_EXIT=Exit
+    set MSG_MENU_UPDATE_BIN=Update /bin/ Folder
+    set MSG_MENU_UPDATE_LIST=Update /lists/list-general.txt
+    set MSG_MENU_UPDATE_IPSET=Update /lists/ipset-all.txt
+    set MSG_MENU_UPDATE_ALL=Update Everything
+    set MSG_MENU_SETTINGS=Change Settings
+    set MSG_MENU_GAME_TCP=Switch Game Filter for TCP (Chats, Profile Pictures, etc.)
+    set MSG_MENU_VERIFY=Verify All Files
+    set MSG_MENU_LANGUAGE=Change Language
+    set MSG_MENU_CHOICE=Enter choice (0-18^)
+    
+    set MSG_STATUS_INSTALLED=Service strategy installed from
+    set MSG_STATUS_RUNNING=is RUNNING
+    set MSG_STATUS_NOT_RUNNING=is NOT running
+    set MSG_STATUS_ALREADY_RUNNING=is ALREADY RUNNING as service, use service.bat and choose Remove Services first if you want to run standalone bat
+    set MSG_STATUS_STOP_PENDING=is STOP_PENDING. This may be caused by a conflict with another bypass. Run Diagnostics to try to fix conflicts
+    set MSG_STATUS_BYPASS_ACTIVE=Bypass (winws.exe^) is ACTIVE
+    set MSG_STATUS_BYPASS_NOT_FOUND=Bypass (winws.exe^) NOT FOUND
+    
+    set MSG_REMOVE_NOT_INSTALLED=Service is not installed
+    
+    set MSG_INSTALL_PICK=Pick one of the options:
+    set MSG_INSTALL_INPUT=Input file index (number^)
+    set MSG_INSTALL_INVALID=Invalid choice, exiting...
+    set MSG_INSTALL_SUCCESS=[S] Config SUCCESS
+    
+    set MSG_UPDATE_FAILED=Failed to fetch the latest version. This does not affect the operation of ShiZapret Addition.
+    set MSG_UPDATE_LATEST=Latest version installed:
+    set MSG_UPDATE_NEW=New version available:
+    set MSG_UPDATE_RELEASE=Release page:
+    set MSG_UPDATE_INSTALL=Do you want to install the new version? (Y/N) (default: Y)
+    set MSG_UPDATE_EXTRACTING=Extracting
+    set MSG_UPDATE_INSTALLED=Update installed into
+    set MSG_UPDATE_REMOVE_SERVICE=Do you want to automatically remove service? (Y/N) (default: Y)
+    set MSG_UPDATE_NOT_INSTALLED=Update was not installed
+    
+    set MSG_DIAG_BFE_PASS=Base Filtering Engine check passed
+    set MSG_DIAG_BFE_FAIL=[X] Base Filtering Engine is not running. This service is required for zapret to work
+    set MSG_DIAG_PROXY_ENABLED=[?] System proxy is enabled:
+    set MSG_DIAG_PROXY_CHECK=Make sure it's valid or disable it if you don't use a proxy
+    set MSG_DIAG_PROXY_PASS=Proxy check passed
+    set MSG_DIAG_TCP_PASS=TCP timestamps check passed
+    set MSG_DIAG_TCP_DISABLED=[?] TCP timestamps are disabled. Enabling timestamps...
+    set MSG_DIAG_TCP_ENABLED=TCP timestamps successfully enabled
+    set MSG_DIAG_TCP_FAILED=[X] Failed to enable TCP timestamps
+    set MSG_DIAG_ADGUARD_FOUND=[X] Adguard process found. Adguard may cause problems with Discord
+    set MSG_DIAG_ADGUARD_PASS=Adguard check passed
+    set MSG_DIAG_KILLER_FOUND=[X] Killer services found. Killer conflicts with zapret
+    set MSG_DIAG_KILLER_PASS=Killer check passed
+    set MSG_DIAG_INTEL_FOUND=[X] Intel Connectivity Network Service found. It conflicts with zapret
+    set MSG_DIAG_INTEL_PASS=Intel Connectivity check passed
+    set MSG_DIAG_CHECKPOINT_FOUND=[X] Check Point services found. Check Point conflicts with zapret
+    set MSG_DIAG_CHECKPOINT_TRY=Try to uninstall Check Point
+    set MSG_DIAG_CHECKPOINT_PASS=Check Point check passed
+    set MSG_DIAG_SMARTBYTE_FOUND=[X] SmartByte services found. SmartByte conflicts with zapret
+    set MSG_DIAG_SMARTBYTE_TRY=Try to uninstall or disable SmartByte through services.msc
+    set MSG_DIAG_SMARTBYTE_PASS=SmartByte check passed
+    set MSG_DIAG_VPN_FOUND=[?] Some VPN services found. Some VPNs can conflict with zapret
+    set MSG_DIAG_VPN_CHECK=Make sure that all VPNs are disabled
+    set MSG_DIAG_VPN_PASS=VPN check passed
+    set MSG_DIAG_DNS_NOT_SET=[?] DNS servers are probably not specified.
+    set MSG_DIAG_DNS_PROVIDER=Provider's DNS servers are probably automatically used, which may affect zapret. It is recommended to install well-known DNS servers and setup DoH
+    set MSG_DIAG_DNS_PASS=DNS check passed
+    set MSG_DIAG_DOH_NOT_SET=[?] Make sure you have configured secure DNS in a browser with a non-default DNS service provider.
+    set MSG_DIAG_DOH_WIN11=If you use Windows 11, you can configure encrypted DNS in the Settings to hide this warning
+    set MSG_DIAG_DOH_PASS=Secure DNS check passed
+    set MSG_DIAG_WINDIVERT_CONFLICT=[?] winws.exe is not running but WinDivert service is active. Attempting to delete WinDivert...
+    set MSG_DIAG_WINDIVERT_FAILED=[X] Failed to delete WinDivert. Checking for conflicting services...
+    set MSG_DIAG_WINDIVERT_FOUND=[?] Found conflicting service:
+    set MSG_DIAG_WINDIVERT_STOPPING=Stopping and removing...
+    set MSG_DIAG_WINDIVERT_REMOVED=Successfully removed service:
+    set MSG_DIAG_WINDIVERT_REMOVE_FAILED=[X] Failed to remove service:
+    set MSG_DIAG_WINDIVERT_NO_CONFLICT=[X] No conflicting services found. Check manually if any other bypass is using WinDivert.
+    set MSG_DIAG_WINDIVERT_RETRY=[?] Attempting to delete WinDivert again...
+    set MSG_DIAG_WINDIVERT_SUCCESS=WinDivert successfully deleted after removing conflicting services
+    set MSG_DIAG_WINDIVERT_STILL_FAILED=[X] WinDivert still cannot be deleted. Check manually if any other bypass is using WinDivert.
+    set MSG_DIAG_CONFLICT_FOUND=[X] Conflicting bypass services found:
+    set MSG_DIAG_CONFLICT_REMOVE=Do you want to remove these conflicting services? (Y/N) (default: N)
+    set MSG_DIAG_DISCORD_CACHE=Do you want to clear the Discord cache? (Y/N) (default: Y)
+    set MSG_DIAG_DISCORD_RUNNING=is running, closing...
+    set MSG_DIAG_DISCORD_CLOSED=was successfully closed
+    set MSG_DIAG_DISCORD_CLOSE_FAILED=Unable to close
+    set MSG_DIAG_DISCORD_CLEANING=Cleaning Discord cache...
+    set MSG_DIAG_DISCORD_DELETED=Successfully deleted
+    set MSG_DIAG_DISCORD_DELETE_FAILED=Failed to delete
+    set MSG_DIAG_DISCORD_NOT_EXIST=does not exist
+    set MSG_DIAG_DISCORD_PTB_CLEANING=Cleaning Discord PTB cache...
+    set MSG_DIAG_DISCORD_CANARY_CLEANING=Cleaning Discord Canary cache...
+    
+    set MSG_GAME_ENABLING=Enabling game filter...
+    set MSG_GAME_DISABLING=Disabling game filter...
+    set MSG_GAME_RESTART=Restart ShiZapret Addition to apply the changes.
+    set MSG_GAME_TCP_ENABLING=Enabling game filter for TCP...
+    set MSG_GAME_TCP_DISABLING=Disabling game filter for TCP...
+    
+    set MSG_IPSET_NOT_DOWNLOADED=ipset is not downloaded.
+    set MSG_IPSET_ENABLING=Enabling ipset based bypass...
+    set MSG_IPSET_DISABLING=Disabling ipset based bypass...
+    set MSG_IPSET_NO_BACKUP=Error: no backup to restore. Update list from service menu by yourself
+    
+    set MSG_DOWNLOAD=Downloading
+    set MSG_DOWNLOAD_SOURCE=Source:
+    set MSG_VERIFY=Verifying
+    set MSG_VERIFY_FAILED=failed the verification. File might be damaged or the correct hash has not been updated yet. Your hash:
+    set MSG_VERIFY_CORRECT=Correct hash:
+    set MSG_VERIFY_SUCCESS=successfully verified. Hash:
+    set MSG_VERIFY_NO_REACH=Could not reach
+    set MSG_VERIFY_TO_VERIFY=to verify
+    set MSG_VERIFY_YOUR_HASH=Your hash:
+    
+    set MSG_SETTINGS_TITLE=Settings
+    set MSG_SETTINGS_UPDATE_START=Update on start:
+    set MSG_SETTINGS_UPDATE_CYGWIN=Update cygwin1.dll:
+    set MSG_SETTINGS_UPDATE_WINDIVERT=Update WinDivert.dll:
+    set MSG_SETTINGS_UPDATE_WINDIVERT64=Update WinDivert64.sys:
+    set MSG_SETTINGS_UPDATE_WINWS=Update winws.exe:
+    set MSG_SETTINGS_UPDATE_IPSET=Update ipset-all.txt:
+    set MSG_SETTINGS_UPDATE_LIST=Update list-general.txt:
+    set MSG_SETTINGS_VERIFY=Verify files when updating:
+    set MSG_SETTINGS_LIST_SOURCE=list-general.txt Source:
+    set MSG_SETTINGS_IPSET_SOURCE=ipset-all Source:
+    set MSG_SETTINGS_HASH_ALG=Verifier Hash Algorithm:
+    set MSG_SETTINGS_BACK=Back
+    set MSG_SETTINGS_CHANGE=Change Setting:
+    set MSG_SETTINGS_RECEIVING=Receiving default download sources...
+    set MSG_SETTINGS_COULD_NOT=Could not receive the default source! Fell back to
+    
+    set MSG_SOURCE_CURRENT=Current source:
+    set MSG_SOURCE_ENTER_0=Enter 0 to go back
+    set MSG_SOURCE_ENTER_1=Enter 1 to reset to default
+    set MSG_SOURCE_NEW_IPSET=Enter the new ipset-all.txt source (link, starts with http(s)://):
+    set MSG_SOURCE_NEW_LIST=Enter the new list-general.txt source (link, starts with http(s)://):
+    
+    set MSG_ALG_CURRENT=Current algorithm:
+    set MSG_ALG_DEFAULT=default:
+    set MSG_ALG_NEW=Enter the new algorithm:
+    
+    set MSG_LANG_CURRENT=Current language
+    set MSG_LANG_BACK=Back
+    set MSG_LANG_SELECT=Select language
+    set MSG_LANG_CHANGED=Language changed. Restarting...
+    
+    set enabled=enabled
+    set disabled=disabled
+    set empty=empty
+    set loaded=loaded
+)
+exit /b
 
 :: TCP ENABLE ==========================
 :tcp_enable
 netsh interface tcp show global | findstr /i "timestamps" | findstr /i "enabled" > nul || netsh interface tcp set global timestamps=enabled > nul 2>&1
 exit /b
 
-
 :: STATUS ==============================
 :service_status
 cls
-chcp 437 > nul
 
 sc query "zapret" >nul 2>&1
 if !errorlevel!==0 (
-    for /f "tokens=2*" %%A in ('reg query "HKLM\System\CurrentControlSet\Services\zapret" /v shizapret 2^>nul') do echo Service strategy installed from '%%B'
+    for /f "tokens=2*" %%A in ('reg query "HKLM\System\CurrentControlSet\Services\zapret" /v shizapret 2^>nul') do echo %MSG_STATUS_INSTALLED% '%%B'
     if !errorlevel!==0 (
-        for /f "tokens=2*" %%A in ('reg query "HKLM\System\CurrentControlSet\Services\zapret" /v zapret-discord-youtube 2^>nul') do call :PrintYellow "Service strategy installed from '%%B' using zapret-discord-youtube or an older version of shizapret."
+        for /f "tokens=2*" %%A in ('reg query "HKLM\System\CurrentControlSet\Services\zapret" /v zapret-discord-youtube 2^>nul') do call :PrintYellow "%MSG_STATUS_INSTALLED% '%%B' using zapret-discord-youtube or an older version of shizapret."
     )
 )
 
@@ -127,9 +814,9 @@ echo:
 
 tasklist /FI "IMAGENAME eq winws.exe" | find /I "winws.exe" > nul
 if !errorlevel!==0 (
-    call :PrintGreen "Bypass (winws.exe) is ACTIVE"
+    call :PrintGreen "%MSG_STATUS_BYPASS_ACTIVE%"
 ) else (
-    call :PrintRed "Bypass (winws.exe) NOT FOUND"
+    call :PrintRed "%MSG_STATUS_BYPASS_NOT_FOUND%"
 )
 
 pause
@@ -144,25 +831,23 @@ set "ServiceStatus=%ServiceStatus: =%"
 
 if "%ServiceStatus%"=="RUNNING" (
     if "%~2"=="soft" (
-        echo "%ServiceName%" is ALREADY RUNNING as service, use "service.bat" and choose "Remove Services" first if you want to run standalone bat.
+        echo "%ServiceName%" %MSG_STATUS_ALREADY_RUNNING%
         pause
         exit /b
     ) else (
-        echo "%ServiceName%" service is RUNNING.
+        echo "%ServiceName%" service %MSG_STATUS_RUNNING%.
     )
 ) else if "%ServiceStatus%"=="STOP_PENDING" (
-    call :PrintYellow "!ServiceName! is STOP_PENDING. This may be caused by a conflict with another bypass. Run Diagnostics to try to fix conflicts"
+    call :PrintYellow "!ServiceName! %MSG_STATUS_STOP_PENDING%"
 ) else if not "%~2"=="soft" (
-    echo "%ServiceName%" service is NOT running.
+    echo "%ServiceName%" service %MSG_STATUS_NOT_RUNNING%.
 )
 
 exit /b
 
-
 :: REMOVE ==============================
 :service_remove
 cls
-chcp 65001 > nul
 
 set SRVCNAME=zapret
 sc query "!SRVCNAME!" >nul 2>&1
@@ -170,7 +855,7 @@ if !errorlevel!==0 (
     net stop %SRVCNAME%
     sc delete %SRVCNAME%
 ) else (
-    echo Service "%SRVCNAME%" is not installed.
+    echo %MSG_REMOVE_NOT_INSTALLED% "%SRVCNAME%".
 )
 
 sc query "WinDivert" >nul 2>&1
@@ -190,11 +875,9 @@ if "%1"=="shizapret" exit /b
 pause
 goto menu
 
-
 :: INSTALL =============================
 :service_install
 cls
-chcp 65001 > nul
 
 :: Main
 cd /d "%~dp0"
@@ -213,9 +896,11 @@ if not exist "lists/ipset-all.txt" (
 
 cls
 
-:: Searching for .bat files in current folder, except for files that start with "service" and "calls"
-echo Pick one of the options:
+:: Searching for .bat files in current folder and strategies folder, except for files that start with "service" and "calls"
+echo %MSG_INSTALL_PICK%
 set "count=0"
+
+:: Search in root directory
 for %%f in (*.bat) do (
     set "filename=%%~nxf"
     if /i not "!filename:~0,7!"=="service" (
@@ -225,14 +910,30 @@ for %%f in (*.bat) do (
     )
 )
 
+:: Search in strategies folder
+if exist "strategies\" (
+    for %%f in (strategies\*.bat) do (
+        set "filename=%%~nxf"
+        if /i not "!filename:~0,7!"=="service" (
+              set /a count+=1
+              echo !count!. %%f
+              set "file!count!=%%f"
+        )
+    )
+)
+
 :: Choosing file
 set "choice="
-set /p "choice=Input file index (number): "
-if "!choice!"=="" goto :eof
+set /p "choice=%MSG_INSTALL_INPUT%: "
+if "!choice!"=="" (
+    echo %MSG_INSTALL_INVALID%
+    pause
+    goto menu
+)
 
 set "selectedFile=!file%choice%!"
 if not defined selectedFile (
-    echo Invalid choice, exiting...
+    echo %MSG_INSTALL_INVALID%
     pause
     goto menu
 )
@@ -257,7 +958,7 @@ for /f "tokens=*" %%a in ('type "!selectedFile!"') do (
 
     if !capture!==1 (
         if not defined args (
-            set "line=!line:*%BIN%winws.exe"=!"
+            set "line=!line:*%BIN%winws.exe!=!"
         )
 
         set "temp_args="
@@ -324,7 +1025,12 @@ call :tcp_enable
 
 set ARGS=%args%
 call set "ARGS=%%ARGS:EXCL_MARK=^!%%"
-echo Final args: !ARGS!
+
+:: Simplified output to show only CONFIG SUCCESS
+echo.
+echo %MSG_INSTALL_SUCCESS%
+echo.
+
 set SRVCNAME=zapret
 
 net stop %SRVCNAME% >nul 2>&1
@@ -340,23 +1046,21 @@ reg add "HKLM\System\CurrentControlSet\Services\zapret" /v shizapret /t REG_SZ /
 pause
 goto menu
 
-
 :: CHECK UPDATES =======================
 :service_check_updates
-chcp 437 > nul
 cls
 
 :: Set current version and URLs
-set "GITHUB_VERSION_URL=https://raw.githubusercontent.com/sch-izo/shizapret/refs/heads/main/.service/version.txt"
-set "GITHUB_RELEASE_URL=https://github.com/sch-izo/shizapret/releases/tag/"
-set "GITHUB_DOWNLOAD_URL=https://github.com/sch-izo/shizapret/releases/latest/download/shizapret-"
+set "GITHUB_VERSION_URL=https://raw.githubusercontent.com/dotFelixan/ShiZapret-Addition/refs/heads/main/.service/version.txt"
+set "GITHUB_RELEASE_URL=https://github.com/dotFelixan/ShiZapret-Addition/releases/tag/"
+set "GITHUB_DOWNLOAD_URL=https://github.com/dotFelixan/ShiZapret-Addition/releases/latest/download/ShiZapret_Addition-"
 
 :: Get the latest version from GitHub
 for /f "delims=" %%A in ('powershell -command "(Invoke-WebRequest -Uri \"%GITHUB_VERSION_URL%\" -Headers @{\"Cache-Control\"=\"no-cache\"} -TimeoutSec 5).Content.Trim()" 2^>nul') do set "GITHUB_VERSION=%%A"
 
 :: Error handling
 if not defined GITHUB_VERSION (
-    echo Failed to fetch the latest version. This does not affect the operation of shizapret.
+    echo %MSG_UPDATE_FAILED%
     timeout /T 9
     if "%1"=="soft" exit 
     goto menu
@@ -364,63 +1068,59 @@ if not defined GITHUB_VERSION (
 
 :: Version comparison
 if "%LOCAL_VERSION%"=="%GITHUB_VERSION%" (
-    echo Latest version installed: %LOCAL_VERSION%
+    echo %MSG_UPDATE_LATEST% %LOCAL_VERSION%
     
     if "%1"=="soft" exit
     pause
     goto menu
 ) 
 
-echo New version available: %GITHUB_VERSION%
-echo Release page: %GITHUB_RELEASE_URL%%GITHUB_VERSION%
+echo %MSG_UPDATE_NEW% %GITHUB_VERSION%
+echo %MSG_UPDATE_RELEASE% %GITHUB_RELEASE_URL%%GITHUB_VERSION%
 
 set "CHOICE="
-set /p "CHOICE=Do you want to install the new version? (Y/N) (default: Y) "
+set /p "CHOICE=%MSG_UPDATE_INSTALL% "
 if "%CHOICE%"=="" set "CHOICE=Y"
-if /i "%CHOICE%"=="y" set "CHOICE=Y"
+if "!CHOICE!"=="y" set "CHOICE=Y"
 
-if /i "%CHOICE%"=="Y" (
+if /i "!CHOICE!"=="Y" (
     cd /d "%~dp0"
     cls
-    call :downloadfile "%GITHUB_DOWNLOAD_URL%%GITHUB_VERSION%.zip" "%~dp0" "shizapret-%GITHUB_VERSION%.zip"
+    call :downloadfile "%GITHUB_DOWNLOAD_URL%%GITHUB_VERSION%.zip" "%~dp0" "ShiZapret_Addition-%GITHUB_VERSION%.zip"
     cls
-    echo Extracting shizapret-%GITHUB_VERSION%.zip...
-    powershell -Command "Expand-Archive 'shizapret-%GITHUB_VERSION%.zip' '%GITHUB_VERSION%'"
-    del shizapret-%GITHUB_VERSION%.zip
+    echo %MSG_UPDATE_EXTRACTING% ShiZapret_Addition-%GITHUB_VERSION%.zip...
+    powershell -Command "Expand-Archive 'ShiZapret_Addition-%GITHUB_VERSION%.zip' '%GITHUB_VERSION%'"
+    del ShiZapret_Addition-%GITHUB_VERSION%.zip
     cls
     if exist "%GITHUB_VERSION%\shizapret.bat" (
-    echo Update installed into "%~dp0%GITHUB_VERSION%".
+    echo %MSG_UPDATE_INSTALLED% "%~dp0%GITHUB_VERSION%".
     set "SERVICE_CHOICE="
-    set /p "SERVICE_CHOICE=Do you want to automatically remove service? (Y/N) (default: Y) "
+    set /p "SERVICE_CHOICE=%MSG_UPDATE_REMOVE_SERVICE% "
     if "%SERVICE_CHOICE%"=="" set "SERVICE_CHOICE=Y"
     if /i "%SERVICE_CHOICE%"=="y" set "SERVICE_CHOICE=Y"
     if /i "%SERVICE_CHOICE%"=="Y" (
         call :service_remove shizapret
     )
     ) else (
-    call :PrintRed "Update was not installed."
+    call :PrintRed "%MSG_UPDATE_NOT_INSTALLED%"
     )
 )
-
 
 if "%1"=="soft" exit
 cls
 pause
 goto menu
 
-
-
 :: DIAGNOSTICS =========================
 :service_diagnostics
-chcp 437 > nul
 cls
 
 :: Base Filtering Engine
 sc query BFE | findstr /I "RUNNING" > nul
 if !errorlevel!==0 (
-    call :PrintGreen "Base Filtering Engine check passed"
+    call :PrintGreen "%MSG_DIAG_BFE_PASS%"
 ) else (
-    call :PrintRed "[X] Base Filtering Engine is not running. This service is required for zapret to work"
+    call :PrintRed "%MSG_DIAG_BFE_FAIL%"
 )
 echo:
 
@@ -437,24 +1137,24 @@ if !proxyEnabled!==1 (
         set "proxyServer=%%B"
     )
 
-    call :PrintYellow "[?] System proxy is enabled: !proxyServer!"
-    call :PrintYellow "Make sure it's valid or disable it if you don't use a proxy"
+    call :PrintYellow "%MSG_DIAG_PROXY_ENABLED% !proxyServer!"
+    call :PrintYellow "%MSG_DIAG_PROXY_CHECK%"
 ) else (
-    call :PrintGreen "Proxy check passed"
+    call :PrintGreen "%MSG_DIAG_PROXY_PASS%"
 )
 echo:
 
 :: TCP timestamps check
 netsh interface tcp show global | findstr /i "timestamps" | findstr /i "enabled" > nul
 if !errorlevel!==0 (
-    call :PrintGreen "TCP timestamps check passed"
+    call :PrintGreen "%MSG_DIAG_TCP_PASS%"
 ) else (
-    call :PrintYellow "[?] TCP timestamps are disabled. Enabling timestamps..."
+    call :PrintYellow "%MSG_DIAG_TCP_DISABLED%"
     netsh interface tcp set global timestamps=enabled > nul 2>&1
     if !errorlevel!==0 (
-        call :PrintGreen "TCP timestamps successfully enabled"
+        call :PrintGreen "%MSG_DIAG_TCP_ENABLED%"
     ) else (
-        call :PrintRed "[X] Failed to enable TCP timestamps"
+        call :PrintRed "%MSG_DIAG_TCP_FAILED%"
     )
 )
 echo:
@@ -462,30 +1162,30 @@ echo:
 :: AdguardSvc.exe
 tasklist /FI "IMAGENAME eq AdguardSvc.exe" | find /I "AdguardSvc.exe" > nul
 if !errorlevel!==0 (
-    call :PrintRed "[X] Adguard process found. Adguard may cause problems with Discord"
+    call :PrintRed "%MSG_DIAG_ADGUARD_FOUND%"
     call :PrintRed "https://github.com/Flowseal/zapret-discord-youtube/issues/417"
 ) else (
-    call :PrintGreen "Adguard check passed"
+    call :PrintGreen "%MSG_DIAG_ADGUARD_PASS%"
 )
 echo:
 
 :: Killer
 sc query | findstr /I "Killer" > nul
 if !errorlevel!==0 (
-    call :PrintRed "[X] Killer services found. Killer conflicts with zapret"
+    call :PrintRed "%MSG_DIAG_KILLER_FOUND%"
     call :PrintRed "https://github.com/Flowseal/zapret-discord-youtube/issues/2512#issuecomment-2821119513"
 ) else (
-    call :PrintGreen "Killer check passed"
+    call :PrintGreen "%MSG_DIAG_KILLER_PASS%"
 )
 echo:
 
 :: Intel Connectivity Network Service
 sc query | findstr /I "Intel" | findstr /I "Connectivity" | findstr /I "Network" > nul
 if !errorlevel!==0 (
-    call :PrintRed "[X] Intel Connectivity Network Service found. It conflicts with zapret"
+    call :PrintRed "%MSG_DIAG_INTEL_FOUND%"
     call :PrintRed "https://github.com/ValdikSS/GoodbyeDPI/issues/541#issuecomment-2661670982"
 ) else (
-    call :PrintGreen "Intel Connectivity check passed"
+    call :PrintGreen "%MSG_DIAG_INTEL_PASS%"
 )
 echo:
 
@@ -502,30 +1202,30 @@ if !errorlevel!==0 (
 )
 
 if !checkpointFound!==1 (
-    call :PrintRed "[X] Check Point services found. Check Point conflicts with zapret"
-    call :PrintRed "Try to uninstall Check Point"
+    call :PrintRed "%MSG_DIAG_CHECKPOINT_FOUND%"
+    call :PrintRed "%MSG_DIAG_CHECKPOINT_TRY%"
 ) else (
-    call :PrintGreen "Check Point check passed"
+    call :PrintGreen "%MSG_DIAG_CHECKPOINT_PASS%"
 )
 echo:
 
 :: SmartByte
 sc query | findstr /I "SmartByte" > nul
 if !errorlevel!==0 (
-    call :PrintRed "[X] SmartByte services found. SmartByte conflicts with zapret"
-    call :PrintRed "Try to uninstall or disable SmartByte through services.msc"
+    call :PrintRed "%MSG_DIAG_SMARTBYTE_FOUND%"
+    call :PrintRed "%MSG_DIAG_SMARTBYTE_TRY%"
 ) else (
-    call :PrintGreen "SmartByte check passed"
+    call :PrintGreen "%MSG_DIAG_SMARTBYTE_PASS%"
 )
 echo:
 
 :: VPN
 sc query | findstr /I "VPN" > nul
 if !errorlevel!==0 (
-    call :PrintYellow "[?] Some VPN services found. Some VPNs can conflict with zapret"
-    call :PrintYellow "Make sure that all VPNs are disabled"
+    call :PrintYellow "%MSG_DIAG_VPN_FOUND%"
+    call :PrintYellow "%MSG_DIAG_VPN_CHECK%"
 ) else (
-    call :PrintGreen "VPN check passed"
+    call :PrintGreen "%MSG_DIAG_VPN_PASS%"
 )
 echo:
 
@@ -537,10 +1237,10 @@ for /f "delims=" %%a in ('powershell -Command "Get-WmiObject -Class Win32_Networ
     )
 )
 if !dnsfound!==1 (
-    call :PrintYellow "[?] DNS servers are probably not specified."
-    call :PrintYellow "Provider's DNS servers are probably automatically used, which may affect zapret. It is recommended to install well-known DNS servers and setup DoH"
+    call :PrintYellow "%MSG_DIAG_DNS_NOT_SET%"
+    call :PrintYellow "%MSG_DIAG_DNS_PROVIDER%"
 ) else (
-    call :PrintGreen "DNS check passed"
+    call :PrintGreen "%MSG_DIAG_DNS_PASS%"
 )
 echo:
 
@@ -552,10 +1252,10 @@ for /f "delims=" %%a in ('powershell -Command "Get-ChildItem -Recurse -Path 'HKL
     )
 )
 if !dohfound!==0 (
-    call :PrintYellow "[?] Make sure you have configured secure DNS in a browser with a non-default DNS service provider."
-    call :PrintYellow "If you use Windows 11, you can configure encrypted DNS in the Settings to hide this warning"
+    call :PrintYellow "%MSG_DIAG_DOH_NOT_SET%"
+    call :PrintYellow "%MSG_DIAG_DOH_WIN11%"
 ) else (
-    call :PrintGreen "Secure DNS check passed"
+    call :PrintGreen "%MSG_DIAG_DOH_PASS%"
 )
 echo:
 
@@ -567,13 +1267,13 @@ sc query "WinDivert" | findstr /I "RUNNING STOP_PENDING" > nul
 set "windivert_running=!errorlevel!"
 
 if !winws_running! neq 0 if !windivert_running!==0 (
-    call :PrintYellow "[?] winws.exe is not running but WinDivert service is active. Attempting to delete WinDivert..."
+    call :PrintYellow "%MSG_DIAG_WINDIVERT_CONFLICT%"
     
     net stop "WinDivert" >nul 2>&1
     sc delete "WinDivert" >nul 2>&1
     sc query "WinDivert" >nul 2>&1
     if !errorlevel!==0 (
-        call :PrintRed "[X] Failed to delete WinDivert. Checking for conflicting services..."
+        call :PrintRed "%MSG_DIAG_WINDIVERT_FAILED%"
         
         set "conflicting_services=GoodbyeDPI"
         set "found_conflict=0"
@@ -581,30 +1281,30 @@ if !winws_running! neq 0 if !windivert_running!==0 (
         for %%s in (!conflicting_services!) do (
             sc query "%%s" >nul 2>&1
             if !errorlevel!==0 (
-                call :PrintYellow "[?] Found conflicting service: %%s. Stopping and removing..."
+                call :PrintYellow "%MSG_DIAG_WINDIVERT_FOUND% %%s. %MSG_DIAG_WINDIVERT_STOPPING%"
                 net stop "%%s" >nul 2>&1
                 sc delete "%%s" >nul 2>&1
                 if !errorlevel!==0 (
-                    call :PrintGreen "Successfully removed service: %%s"
+                    call :PrintGreen "%MSG_DIAG_WINDIVERT_REMOVED% %%s"
                 ) else (
-                    call :PrintRed "[X] Failed to remove service: %%s"
+                    call :PrintRed "%MSG_DIAG_WINDIVERT_REMOVE_FAILED% %%s"
                 )
                 set "found_conflict=1"
             )
         )
         
         if !found_conflict!==0 (
-            call :PrintRed "[X] No conflicting services found. Check manually if any other bypass is using WinDivert."
+            call :PrintRed "%MSG_DIAG_WINDIVERT_NO_CONFLICT%"
         ) else (
-            call :PrintYellow "[?] Attempting to delete WinDivert again..."
+            call :PrintYellow "%MSG_DIAG_WINDIVERT_RETRY%"
 
             net stop "WinDivert" >nul 2>&1
             sc delete "WinDivert" >nul 2>&1
             sc query "WinDivert" >nul 2>&1
             if !errorlevel! neq 0 (
-                call :PrintGreen "WinDivert successfully deleted after removing conflicting services"
+                call :PrintGreen "%MSG_DIAG_WINDIVERT_SUCCESS%"
             ) else (
-                call :PrintRed "[X] WinDivert still cannot be deleted. Check manually if any other bypass is using WinDivert."
+                call :PrintRed "%MSG_DIAG_WINDIVERT_STILL_FAILED%"
             )
         )
     ) else (
@@ -632,22 +1332,22 @@ for %%s in (!conflicting_services!) do (
 )
 
 if !found_any_conflict!==1 (
-    call :PrintRed "[X] Conflicting bypass services found: !found_conflicts!"
+    call :PrintRed "%MSG_DIAG_CONFLICT_FOUND% !found_conflicts!"
     
     set "CHOICE="
-    set /p "CHOICE=Do you want to remove these conflicting services? (Y/N) (default: N) "
+    set /p "CHOICE=%MSG_DIAG_CONFLICT_REMOVE% "
     if "!CHOICE!"=="" set "CHOICE=N"
     if "!CHOICE!"=="y" set "CHOICE=Y"
     
     if /i "!CHOICE!"=="Y" (
         for %%s in (!found_conflicts!) do (
-            call :PrintYellow "Stopping and removing service: %%s"
+            call :PrintYellow "%MSG_DIAG_WINDIVERT_STOPPING% %%s"
             net stop "%%s" >nul 2>&1
             sc delete "%%s" >nul 2>&1
             if !errorlevel!==0 (
-                call :PrintGreen "Successfully removed service: %%s"
+                call :PrintGreen "%MSG_DIAG_WINDIVERT_REMOVED% %%s"
             ) else (
-                call :PrintRed "[X] Failed to remove service: %%s"
+                call :PrintRed "%MSG_DIAG_WINDIVERT_REMOVE_FAILED% %%s"
             )
         )
 
@@ -662,7 +1362,7 @@ if !found_any_conflict!==1 (
 
 :: Discord cache clearing
 set "CHOICE="
-set /p "CHOICE=Do you want to clear the Discord cache? (Y/N) (default: Y)  "
+set /p "CHOICE=%MSG_DIAG_DISCORD_CACHE%  "
 if "!CHOICE!"=="" set "CHOICE=Y"
 if "!CHOICE!"=="y" set "CHOICE=Y"
 
@@ -670,12 +1370,12 @@ if /i "!CHOICE!"=="Y" (
     for %%i in ("Discord.exe" "DiscordPTB.exe" "DiscordCanary.exe") do (
         tasklist /FI "IMAGENAME eq %%i" | findstr /I "%%i" > nul
         if !errorlevel!==0 (
-            echo %%i is running, closing...
+            echo %%i %MSG_DIAG_DISCORD_RUNNING%
             taskkill /IM %%i /F > nul
             if !errorlevel! == 0 (
-                call :PrintGreen "%%i was successfully closed"
+                call :PrintGreen "%%i %MSG_DIAG_DISCORD_CLOSED%"
             ) else (
-                call :PrintRed "Unable to close %%i"
+                call :PrintRed "%MSG_DIAG_DISCORD_CLOSE_FAILED% %%i"
             )
         )
     )
@@ -684,51 +1384,51 @@ if /i "!CHOICE!"=="Y" (
     set "discordPTBCacheDir=%appdata%\discordptb"
     set "discordCanaryCacheDir=%appdata%\discordcanary"
 
-    echo Cleaning Discord cache...
+    echo %MSG_DIAG_DISCORD_CLEANING%
     for %%d in ("Cache" "Code Cache" "GPUCache") do (
         set "dirPath=!discordCacheDir!\%%~d"
         if exist "!dirPath!" (
             rd /s /q "!dirPath!"
             if !errorlevel!==0 (
-                call :PrintGreen "Successfully deleted !dirPath!"
+                call :PrintGreen "%MSG_DIAG_DISCORD_DELETED% !dirPath!"
             ) else (
-                call :PrintRed "Failed to delete !dirPath!"
+                call :PrintRed "%MSG_DIAG_DISCORD_DELETE_FAILED% !dirPath!"
             )
         ) else (
-            call :PrintRed "!dirPath! does not exist"
+            call :PrintRed "!dirPath! %MSG_DIAG_DISCORD_NOT_EXIST%"
         )
     )
     
     if exist "!discordPTBCacheDir!\" (
-        echo Cleaning Discord PTB cache...
+        echo %MSG_DIAG_DISCORD_PTB_CLEANING%
         for %%d in ("Cache" "Code Cache" "GPUCache") do (
             set "dirPath=!discordPTBCacheDir!\%%~d"
             if exist "!dirPath!" (
                 rd /s /q "!dirPath!"
                 if !errorlevel!==0 (
-                    call :PrintGreen "Successfully deleted !dirPath!"
+                    call :PrintGreen "%MSG_DIAG_DISCORD_DELETED% !dirPath!"
                 ) else (
-                    call :PrintRed "Failed to delete !dirPath!"
+                    call :PrintRed "%MSG_DIAG_DISCORD_DELETE_FAILED% !dirPath!"
                 )
             ) else (
-                call :PrintRed "!dirPath! does not exist"
+                call :PrintRed "!dirPath! %MSG_DIAG_DISCORD_NOT_EXIST%"
             )
         )
     )
 
     if exist "!discordCanaryCacheDir!\" (
-        echo Cleaning Discord Canary cache...
+        echo %MSG_DIAG_DISCORD_CANARY_CLEANING%
         for %%d in ("Cache" "Code Cache" "GPUCache") do (
             set "dirPath=!discordCanaryCacheDir!\%%~d"
             if exist "!dirPath!" (
                 rd /s /q "!dirPath!"
                 if !errorlevel!==0 (
-                    call :PrintGreen "Successfully deleted !dirPath!"
+                    call :PrintGreen "%MSG_DIAG_DISCORD_DELETED% !dirPath!"
                 ) else (
-                    call :PrintRed "Failed to delete !dirPath!"
+                    call :PrintRed "%MSG_DIAG_DISCORD_DELETE_FAILED% !dirPath!"
                 )
             ) else (
-                call :PrintRed "!dirPath! does not exist"
+                call :PrintRed "!dirPath! %MSG_DIAG_DISCORD_NOT_EXIST%"
             )
         )
     )
@@ -738,91 +1438,80 @@ echo:
 pause
 goto menu
 
-
 :: GAME SWITCH ========================
 :game_switch_status
-chcp 437 > nul
-
 set "gameFlagFile=%~dp0bin\game_filter.enabled"
 
 if exist "%gameFlagFile%" (
-    set "GameFilterStatus=enabled"
+    set "GameFilterStatus=%enabled%"
     set "GameFilter=1024-65535"
 ) else (
-    set "GameFilterStatus=disabled"
+    set "GameFilterStatus=%disabled%"
     set "GameFilter=12"
 )
 
 set "gameTCPFlagFile=%~dp0bin\game_filtertcp.enabled"
 
 if exist "%gameTCPFlagFile%" (
-    set "GameFilterTCPStatus=enabled"
+    set "GameFilterTCPStatus=%enabled%"
     set "GameFilterTCP=1024-65535"
 ) else (
-    set "GameFilterTCPStatus=disabled"
+    set "GameFilterTCPStatus=%disabled%"
     set "GameFilterTCP=12"
 )
 exit /b
 
-
 :game_switch
-chcp 437 > nul
 cls
 
 if not exist "%gameFlagFile%" (
-    echo Enabling game filter...
+    echo %MSG_GAME_ENABLING%
     echo ENABLED > "%gameFlagFile%"
-    call :PrintYellow "Restart shizapret to apply the changes."
+    call :PrintYellow "%MSG_GAME_RESTART%"
 ) else (
-    echo Disabling game filter...
+    echo %MSG_GAME_DISABLING%
     del /f /q "%gameFlagFile%"
-    call :PrintYellow "Restart shizapret to apply the changes."
+    call :PrintYellow "%MSG_GAME_RESTART%"
 )
 
 pause
 goto menu
 
 :game_switch_tcp
-chcp 437 > nul
 cls
 
 if not exist "%gameTCPFlagFile%" (
-    echo Enabling game filter for TCP...
+    echo %MSG_GAME_TCP_ENABLING%
     echo ENABLED > "%gameTCPFlagFile%"
-    call :PrintYellow "Restart shizapret to apply the changes."
+    call :PrintYellow "%MSG_GAME_RESTART%"
 ) else (
-    echo Disabling game filter for TCP...
+    echo %MSG_GAME_TCP_DISABLING%
     del /f /q "%gameTCPFlagFile%"
-    call :PrintYellow "Restart shizapret to apply the changes."
+    call :PrintYellow "%MSG_GAME_RESTART%"
 )
 
 pause
 goto menu
 
-
 :: IPSET SWITCH =======================
 :ipset_switch_status
-chcp 437 > nul
-
 if exist "%~dp0lists/ipset-all.txt" (
     findstr /R "^203\.0\.113\.113/32$" "%~dp0lists\ipset-all.txt" >nul
     if !errorlevel!==0 (
-        set "IPsetStatus=empty"
+        set "IPsetStatus=%empty%"
     ) else (
-        set "IPsetStatus=loaded"
+        set "IPsetStatus=%loaded%"
     )
 ) else (
-    set "IPsetStatus=empty"
+    set "IPsetStatus=%empty%"
 )
 exit /b
 
-
 :ipset_switch
-chcp 437 > nul
 cls
 set "listFile=%~dp0lists\ipset-all.txt"
 if not exist "%listFile%" (
-  call :PrintRed "ipset is not downloaded."
+  call :PrintRed "%MSG_IPSET_NOT_DOWNLOADED%"
   pause
   goto menu
 )
@@ -830,17 +1519,17 @@ set "backupFile=%listFile%.backup"
 
 findstr /R "^203\.0\.113\.113/32$" "%listFile%" >nul
 if !errorlevel!==0 (
-    echo Enabling ipset based bypass...
+    echo %MSG_IPSET_ENABLING%
 
     if exist "%backupFile%" (
         del /f /q "%listFile%"
         ren "%backupFile%" "ipset-all.txt"
     ) else (
-        echo Error: no backup to restore. Update list from service menu by yourself
+        echo %MSG_IPSET_NO_BACKUP%
     )
 
 ) else (
-    echo Disabling ipset based bypass...
+    echo %MSG_IPSET_DISABLING%
 
     if not exist "%backupFile%" (
         ren "%listFile%" "ipset-all.txt.backup"
@@ -888,6 +1577,7 @@ goto menu
 
 :bin
 cd /d "%~dp0"
+call :getsources
 call :getalgorithm
 if exist "params/Updater/EverythingWinws1" (
     cls
@@ -960,55 +1650,54 @@ cls
 call :getsources
 
 if not exist "params/AutoUpdater/AutoUpdate1" (
-    set "autoupdate=Disabled"
+    set "autoupdate=%disabled%"
 ) else (
-    set "autoupdate=Enabled"
+    set "autoupdate=%enabled%"
 )
 
 if not exist "params/Updater/EverythingCygwin11" (
-    set "cygwin1=Disabled"
+    set "cygwin1=%disabled%"
 ) else (
-    set "cygwin1=Enabled"
+    set "cygwin1=%enabled%"
 )
 
 if not exist "params/Updater/EverythingWinDivert1" (
-    set "windivert=Disabled"
+    set "windivert=%disabled%"
 ) else (
-    set "windivert=Enabled"
+    set "windivert=%enabled%"
 )
 
 if not exist "params/Updater/EverythingWinDivert641" (
-    set "windivert64=Disabled"
+    set "windivert64=%disabled%"
 ) else (
-    set "windivert64=Enabled"
+    set "windivert64=%enabled%"
 )
 
 if not exist "params/Updater/EverythingWinws1" (
-    set "winws=Disabled"
+    set "winws=%disabled%"
 ) else (
-    set "winws=Enabled"
+    set "winws=%enabled%"
 )
 
 if not exist "params/Updater/EverythingIPSet1" (
-    set "ipset=Disabled"
+    set "ipset=%disabled%"
 ) else (
-    set "ipset=Enabled"
+    set "ipset=%enabled%"
 )
 
 if not exist "params/Updater/EverythingList1" (
-    set "general=Disabled"
+    set "general=%disabled%"
 ) else (
-    set "general=Enabled"
+    set "general=%enabled%"
 )
 
 if not exist "params/Updater/VerifyFiles1" (
-    set "verifywhenupdate=Disabled"
+    set "verifywhenupdate=%disabled%"
 ) else (
-    set "verifywhenupdate=Enabled"
+    set "verifywhenupdate=%enabled%"
 )
 
-
-echo Receiving default download sources...
+echo %MSG_SETTINGS_RECEIVING%
 
 if not defined defaultipsetsource (
 for /f "delims=" %%A in ('powershell -command "(Invoke-WebRequest -Uri "https://raw.githubusercontent.com/sch-izo/shizapret/refs/heads/main/params/DownloadSources/IPSetSource" -TimeoutSec 5).Content.Trim()" 2^>nul') do set "defaultipsetsource=%%A"
@@ -1031,26 +1720,26 @@ if "%IPSET_SOURCE%"=="%defaultipsetsource%" set "ipsetdefault=(Default)"
 set "settings_choice=null"
 if not defined defaultipsetsource (
     set "defaultipsetsource=https://raw.githubusercontent.com/sch-izo/shizapret/refs/heads/main/.service/ipset-all.txt"
-    echo Could not receive the default IP Set source! Fell back to "%defaultipsetsource%".
+    echo %MSG_SETTINGS_COULD_NOT% IP Set "%defaultipsetsource%".
 )
 if not defined defaultlistsource (
     set "defaultlistsource=https://raw.githubusercontent.com/bol-van/rulist/refs/heads/main/reestr_hostname.txt"
-    echo Could not receive the default list source! Fell back to "%defaultlistsource%".
+    echo %MSG_SETTINGS_COULD_NOT% list "%defaultlistsource%".
 )
-echo =======Settings========
-echo 1. Update on start: %autoupdate%
-echo 2. Update cygwin1.dll: %cygwin1%
-echo 3. Update WinDivert.dll: %windivert%
-echo 4. Update WinDivert64.sys: %windivert64%
-echo 5. Update winws.exe: %winws%
-echo 6. Update ipset-all.txt: %ipset%
-echo 7. Update list-general.txt: %general%
-echo 8. Verify files when updating: %verifywhenupdate%
-echo 9. list-general.txt Source: %LIST_SOURCE% %listdefault%
-echo 10. ipset-all Source: %IPSET_SOURCE% %ipsetdefault%
-echo 11. Verifier Hash Algorithm: %ALG%
-echo 0. Back
-set /p settings_choice=Change Setting: 
+echo =======%MSG_SETTINGS_TITLE%========
+echo 1. %MSG_SETTINGS_UPDATE_START% %autoupdate%
+echo 2. %MSG_SETTINGS_UPDATE_CYGWIN% %cygwin1%
+echo 3. %MSG_SETTINGS_UPDATE_WINDIVERT% %windivert%
+echo 4. %MSG_SETTINGS_UPDATE_WINDIVERT64% %windivert64%
+echo 5. %MSG_SETTINGS_UPDATE_WINWS% %winws%
+echo 6. %MSG_SETTINGS_UPDATE_IPSET% %ipset%
+echo 7. %MSG_SETTINGS_UPDATE_LIST% %general%
+echo 8. %MSG_SETTINGS_VERIFY% %verifywhenupdate%
+echo 9. %MSG_SETTINGS_LIST_SOURCE% %LIST_SOURCE% %listdefault%
+echo 10. %MSG_SETTINGS_IPSET_SOURCE% %IPSET_SOURCE% %ipsetdefault%
+echo 11. %MSG_SETTINGS_HASH_ALG% %ALG%
+echo 0. %MSG_SETTINGS_BACK%
+set /p settings_choice=%MSG_SETTINGS_CHANGE% 
 
 if "%settings_choice%"=="1" call :switchsetting "params\AutoUpdater\AutoUpdate1"
 if "%settings_choice%"=="2" call :switchsetting "params\Updater\EverythingCygwin11"
@@ -1078,7 +1767,7 @@ goto settings
 
 :setipsetsource
 
-echo Receiving the default IP Set download source...
+echo %MSG_SETTINGS_RECEIVING% IP Set...
 
 if not defined defaultipsetsource (
 for /f "delims=" %%A in ('powershell -command "(Invoke-WebRequest -Uri "https://raw.githubusercontent.com/sch-izo/shizapret/refs/heads/main/params/DownloadSources/IPSetSource" -TimeoutSec 5).Content.Trim()" 2^>nul') do set "defaultipsetsource=%%A"
@@ -1086,18 +1775,18 @@ for /f "delims=" %%A in ('powershell -command "(Invoke-WebRequest -Uri "https://
 
 if not defined defaultipsetsource (
     set "defaultipsetsource=https://raw.githubusercontent.com/sch-izo/shizapret/refs/heads/main/.service/ipset-all.txt"
-    echo Could not receive the default IP Set source! Fell back to "%defaultipsetsource%".
+    echo %MSG_SETTINGS_COULD_NOT% IP Set "%defaultipsetsource%".
 )
 
 cls
-echo Current source: %IPSET_SOURCE% %ipsetdefault%
+echo %MSG_SOURCE_CURRENT% %IPSET_SOURCE% %ipsetdefault%
 echo ==============================
-echo Enter 0 to go back
-echo Enter 1 to reset to default
+echo %MSG_SOURCE_ENTER_0%
+echo %MSG_SOURCE_ENTER_1%
 echo ==============================
 
 set "IPSET_SOURCE_INPUT=0"
-set /p IPSET_SOURCE_INPUT=Enter the new ipset-all.txt source (link, starts with http(s)://): 
+set /p IPSET_SOURCE_INPUT=%MSG_SOURCE_NEW_IPSET% 
 
 :: static commands
 
@@ -1115,7 +1804,7 @@ goto settings
 
 :setlistsource
 
-echo Receiving the default list download source...
+echo %MSG_SETTINGS_RECEIVING% list...
 
 if not defined defaultlistsource (
 for /f "delims=" %%A in ('powershell -command "(Invoke-WebRequest -Uri "https://raw.githubusercontent.com/sch-izo/shizapret/refs/heads/main/params/DownloadSources/ListSource" -TimeoutSec 5).Content.Trim()" 2^>nul') do set "defaultlistsource=%%A"
@@ -1123,18 +1812,18 @@ for /f "delims=" %%A in ('powershell -command "(Invoke-WebRequest -Uri "https://
 
 if not defined defaultlistsource (
     set "defaultlistsource=https://raw.githubusercontent.com/bol-van/rulist/refs/heads/main/reestr_hostname.txt"
-    echo Could not receive the default list source! Fell back to "%defaultlistsource%".
+    echo %MSG_SETTINGS_COULD_NOT% list "%defaultlistsource%".
 )
 
 cls
-echo Current source: %LIST_SOURCE% %listdefault%
+echo %MSG_SOURCE_CURRENT% %LIST_SOURCE% %listdefault%
 echo ==============================
-echo Enter 0 to go back
-echo Enter 1 to reset to default
+echo %MSG_SOURCE_ENTER_0%
+echo %MSG_SOURCE_ENTER_1%
 echo ==============================
 
 set "LIST_SOURCE_INPUT=0"
-set /p LIST_SOURCE_INPUT=Enter the new list-general.txt source (link, starts with http(s)://): 
+set /p LIST_SOURCE_INPUT=%MSG_SOURCE_NEW_LIST% 
 
 :: static commands
 
@@ -1153,9 +1842,9 @@ goto settings
 :setalgorithm
 
 cls
-echo Current algorithm: %ALG%, default: SHA512
+echo %MSG_ALG_CURRENT% %ALG%, %MSG_ALG_DEFAULT% SHA512
 echo ==============================
-echo Enter 0 to go back
+echo %MSG_SOURCE_ENTER_0%
 echo 1. SHA1 (160-bit)
 echo 2. SHA256 (256-bit)
 echo 3. SHA384 (384-bit)
@@ -1164,7 +1853,7 @@ echo 5. MD5 (128-bit)
 echo ==============================
 
 set "IPSET_SOURCE_INPUT=0"
-set /p IPSET_SOURCE_INPUT=Enter the new algorithm: 
+set /p IPSET_SOURCE_INPUT=%MSG_ALG_NEW% 
 
 :: static commands
 
@@ -1178,6 +1867,7 @@ if "%IPSET_SOURCE_INPUT%"=="5" call :switchalgorithm "MD5"
 :switchalgorithm
 echo %~1> %~dp0params/Verifier/HashAlgorithm
 goto settings
+
 :: ===== verify all files =====
 
 :verifyall
@@ -1221,8 +1911,8 @@ exit/b
 :: call :downloadfile (uri) (destination) (name)
 :: call :downloadfile "github.com/example.txt" "bin/example.bin" "Example" 
 
-echo Downloading %~3...
-echo Source: %~1
+echo %MSG_DOWNLOAD% %~3...
+echo %MSG_DOWNLOAD_SOURCE% %~1
 powershell -Command "Start-BitsTransfer -Source \"%~1\" -Destination \"%~2\" -DisplayName \"%~3\" -Description \" \""
 exit /b
 
@@ -1233,18 +1923,18 @@ exit /b
 :: call :verifyfile (hash uri) (file to verify) (name)
 :: call :verifyfile "github.com/example.%ALG%" "bin/example.bin" "Example"
 
-echo Verifying %~3...
-for /f "delims=" %%A in ('powershell -Command "(Invoke-WebRequest -Uri \"%~1\" -Headers @{\"Cache-Control\"=\"no-cache\"} -TimeoutSec 5).Content.Trim()" 2^>nul') do set "CORRECTHASH=%%A"
+echo %MSG_VERIFY% %~3...
+for /f "delims=" %%A in ('powershell -command "(Invoke-WebRequest -Uri \"%~1\" -Headers @{\"Cache-Control\"=\"no-cache\"} -TimeoutSec 5).Content.Trim()" 2^>nul') do set "CORRECTHASH=%%A"
 
 for /f "tokens=2 delims=: " %%A in ('powershell -Command "Get-FileHash %~2 -Algorithm %ALG% | Format-List -Property Hash"') do set "LOCALHASH=%%A"
 if not defined CORRECTHASH (
-    call :PrintYellow "Could not reach %~1 to verify %~3. Your hash: %LOCALHASH%"
+    call :PrintYellow "%MSG_VERIFY_NO_REACH% %~1 %MSG_VERIFY_TO_VERIFY% %~3. %MSG_VERIFY_YOUR_HASH% %LOCALHASH%"
     exit /b
 )
 if "%LOCALHASH%"=="%CORRECTHASH%" (
-    call :PrintGreen "%~3 successfully verified. Hash: %LOCALHASH%"
+    call :PrintGreen "%~3 %MSG_VERIFY_SUCCESS% %LOCALHASH%"
 ) else (
-    call :PrintRed "%~3 failed the verification. File might be damaged or the correct hash has not been updated yet. Your hash: %LOCALHASH%, Correct hash: %CORRECTHASH%"
+    call :PrintRed "%~3 %MSG_VERIFY_FAILED% %LOCALHASH%, %MSG_VERIFY_CORRECT% %CORRECTHASH%"
     pause
 )
 exit /b
